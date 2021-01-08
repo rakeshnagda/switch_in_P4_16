@@ -13,444 +13,369 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+#include <core.p4>
+#include <v1model.p4>
+#include "defines.p4"
 
-header_type ethernet_t {
-    fields {
-        dstAddr : 48;
-        srcAddr : 48;
-        etherType : 16;
-    }
+header ethernet_t {    
+    bit<48> dstAddr;
+    bit<48> srcAddr;
+    bit<16> etherType;
 }
 
-header_type llc_header_t {
-    fields {
-        dsap : 8;
-        ssap : 8;
-        control_ : 8;
-    }
+
+header llc_header_t {    
+    bit<8> dsap;
+    bit<8> ssap;
+    bit<8> control_;
 }
 
-header_type snap_header_t {
-    fields {
-        oui : 24;
-        type_ : 16;
-    }
+header snap_header_t {    
+    bit<24> oui;
+    bit<16> type_;
 }
 
-header_type roce_header_t {
-    fields {
-        ib_grh : 320;
-        ib_bth : 96;
-    }
+header roce_header_t {    
+    bit<320> ib_grh;
+    bit<96> ib_bth;
 }
 
-header_type roce_v2_header_t {
-    fields {
-        ib_bth : 96;
+header roce_v2_header_t {   
+        bit<96> ib_bth;
     }
+
+header fcoe_header_t {    
+    bit<4> version;
+    bit<4> type_;
+    bit<8> sof;
+    bit<32> rsvd1;
+    bit<32> ts_upper;
+    bit<32> ts_lower;
+    bit<32> size_;
+    bit<8> eof;
+    bit<24> rsvd2;
 }
 
-header_type fcoe_header_t {
-    fields {
-        version : 4;
-        type_ : 4;
-        sof : 8;
-        rsvd1 : 32;
-        ts_upper : 32;
-        ts_lower : 32;
-        size_ : 32;
-        eof : 8;
-        rsvd2 : 24;
-    }
+header vlan_tag_t {    
+    bit<3> pcp;
+    bit<1> cfi;
+    bit<12> vid;
+    bit<16> etherType;
 }
 
-header_type vlan_tag_t {
-    fields {
-        pcp : 3;
-        cfi : 1;
-        vid : 12;
-        etherType : 16;
-    }
+header ieee802_1ah_t {    
+    bit<3> pcp;
+    bit<1> dei;
+    bit<1> uca;
+    bit<3> reserved;
+    bit<24> i_sid;
 }
 
-header_type ieee802_1ah_t {
-    fields {
-        pcp : 3;
-        dei : 1;
-        uca : 1;
-        reserved : 3;
-        i_sid : 24;
-    }
+header mpls_t {
+    bit<20> label;
+    bit<3> exp;
+    bit<1> bos;
+    bit<8> ttl;
 }
 
-header_type mpls_t {
-    fields {
-        label : 20;
-        exp : 3;
-        bos : 1;
-        ttl : 8;
-    }
+header ipv4_t {
+    bit<4> version;
+    bit<4> ihl;
+    bit<8> diffserv;
+    bit<16> totalLen;
+    bit<16> identification;
+    bit<3> flags;
+    bit<13> fragOffset;
+    bit<8> ttl;
+    bit<8> protocol;
+    bit<16> hdrChecksum;
+    bit<32> srcAddr;
+    bit<32> dstAddr;
 }
 
-header_type ipv4_t {
-    fields {
-        version : 4;
-        ihl : 4;
-        diffserv : 8;
-        totalLen : 16;
-        identification : 16;
-        flags : 3;
-        fragOffset : 13;
-        ttl : 8;
-        protocol : 8;
-        hdrChecksum : 16;
-        srcAddr : 32;
-        dstAddr: 32;
-    }
+header ipv6_t {
+    bit<4> version;
+    bit<8> trafficClass;
+    bit<20> flowLabel;
+    bit<16> payloadLen;
+    bit<8> nextHdr;
+    bit<8> hopLimit;
+    bit<128> srcAddr;
+    bit<128> dstAddr;
 }
 
-header_type ipv6_t {
-    fields {
-        version : 4;
-        trafficClass : 8;
-        flowLabel : 20;
-        payloadLen : 16;
-        nextHdr : 8;
-        hopLimit : 8;
-        srcAddr : 128;
-        dstAddr : 128;
-    }
+header icmp_t {
+    bit<16> typeCode;
+    bit<16> hdrChecksum;
 }
 
-header_type icmp_t {
-    fields {
-        typeCode : 16;
-        hdrChecksum : 16;
-    }
+header tcp_t {
+    bit<16> srcPort;
+    bit<16> dstPort;
+    bit<32> seqNo;
+    bit<32> ackNo;
+    bit<4> dataOffset;
+    bit<4> res;
+    bit<8> flags;
+    bit<16> window;
+    bit<16> checksum;
+    bit<16> urgentPtr;
 }
 
-header_type tcp_t {
-    fields {
-        srcPort : 16;
-        dstPort : 16;
-        seqNo : 32;
-        ackNo : 32;
-        dataOffset : 4;
-        res : 4;
-        flags : 8;
-        window : 16;
-        checksum : 16;
-        urgentPtr : 16;
-    }
+header udp_t {
+    bit<16> srcPort;
+    bit<16> dstPort;
+    bit<16> length_;
+    bit<16> checksum;
 }
 
-header_type udp_t {
-    fields {
-        srcPort : 16;
-        dstPort : 16;
-        length_ : 16;
-        checksum : 16;
-    }
+header sctp_t {
+    bit<16> srcPort;
+    bit<16> dstPort;
+    bit<32> verifTag;
+    bit<32> checksum;
 }
 
-header_type sctp_t {
-    fields {
-        srcPort : 16;
-        dstPort : 16;
-        verifTag : 32;
-        checksum : 32;
-    }
+header gre_t {
+    bit<1> C;
+    bit<1> R;
+    bit<1> K;
+    bit<1> S;
+    bit<1> s;
+    bit<3> recurse;
+    bit<5> flags;
+    bit<3> ver;
+    bit<16> proto;
 }
 
-header_type gre_t {
-    fields {
-        C : 1;
-        R : 1;
-        K : 1;
-        S : 1;
-        s : 1;
-        recurse : 3;
-        flags : 5;
-        ver : 3;
-        proto : 16;
-    }
-}
-
-header_type nvgre_t {
-    fields {
-        tni : 24;
-        flow_id : 8;
-    }
+header nvgre_t {
+    bit<24> tni;
+    bit<8> flow_id;
 }
 
 /* erspan III header - 12 bytes */
-header_type erspan_header_t3_t {
-    fields {
-        version : 4;
-        vlan : 12;
-        priority : 6;
-        span_id : 10;
-        timestamp : 32;
-        sgt       : 16;
-        ft_d_other: 16;
-    }
+header erspan_header_t3_t {
+    bit<4> version;
+    bit<12> vlan;
+    bit<6> priority;
+    bit<10> span_id;
+    bit<32> timestamp;
+    bit<16> sgt;
+    bit<16> ft_d_other;
 }
 
-header_type ipsec_esp_t {
-    fields {
-        spi : 32;
-        seqNo : 32;
-    }
+header ipsec_esp_t {
+    bit<32> spi;
+    bit<32> seqNo;
 }
 
-header_type ipsec_ah_t {
-    fields {
-        nextHdr : 8;
-        length_ : 8;
-        zero : 16;
-        spi : 32;
-        seqNo : 32;
-    }
+header ipsec_ah_t {
+    bit<8> nextHdr;
+    bit<8> length_;
+    bit<16> zero;
+    bit<32> spi;
+    bit<32> seqNo;
 }
 
-header_type arp_rarp_t {
-    fields {
-        hwType : 16;
-        protoType : 16;
-        hwAddrLen : 8;
-        protoAddrLen : 8;
-        opcode : 16;
-    }
+header arp_rarp_t {
+    bit<16> hwType;
+    bit<16> protoType;
+    bit<8> hwAddrLen;
+    bit<8> protoAddrLen;
+    bit<16> opcode;
 }
 
-header_type arp_rarp_ipv4_t {
-    fields {
-        srcHwAddr : 48;
-        srcProtoAddr : 32;
-        dstHwAddr : 48;
-        dstProtoAddr : 32;
-    }
+header arp_rarp_ipv4_t {
+    bit<48> srcHwAddr;
+    bit<32> srcProtoAddr;
+    bit<48> dstHwAddr;
+    bit<32> dstProtoAddr;
 }
 
-header_type eompls_t {
-    fields {
-        zero : 4;
-        reserved : 12;
-        seqNo : 16;
-    }
+header eompls_t {
+    bit<4> zero;
+    bit<12> reserved;
+    bit<16> seqNo;
 }
 
-header_type vxlan_t {
-    fields {
-        flags : 8;
-        reserved : 24;
-        vni : 24;
-        reserved2 : 8;
-    }
+header vxlan_t {
+    bit<8> flags;
+    bit<24> reserved;
+    bit<24> vni;
+    bit<8> reserved2;
 }
 
-header_type vxlan_gpe_t {
-    fields {
-        flags : 8;
-        reserved : 16;
-        next_proto : 8;
-        vni : 24;
-        reserved2 : 8;
-    }
+header vxlan_gpe_t {
+    bit<8> flags;
+    bit<16> reserved;
+    bit<8> next_proto;
+    bit<24> vni;
+    bit<8> reserved2;
 }
 
-header_type nsh_t {
-    fields {
-        oam : 1;
-        context : 1;
-        flags : 6;
-        reserved : 8;
-        protoType: 16;
-        spath : 24;
-        sindex : 8;
-    }
+header nsh_t {
+    bit<1> oam;
+    bit<1> context;
+    bit<6> flags;
+    bit<8> reserved;
+    bit<16> protoType;
+    bit<24> spath;
+    bit<8> sindex;
 }
 
-header_type nsh_context_t {
-    fields {
-        network_platform : 32;
-        network_shared : 32;
-        service_platform : 32;
-        service_shared : 32;
-    }
+header nsh_context_t {
+    bit<32> network_platform;
+    bit<32> network_shared;
+    bit<32> service_platform;
+    bit<32> service_shared;
 }
 
-header_type vxlan_gpe_int_header_t {
-    fields {
-        int_type    : 8;
-        rsvd        : 8;
-        len         : 8;
-        next_proto  : 8;
-    }
+header vxlan_gpe_int_header_t {
+    bit<8> int_type;
+    bit<8> rsvd;
+    bit<8> len;
+    bit<8> next_proto;
 }
 
 /* GENEVE HEADERS
-   3 possible options with known type, known length */
+3 possible options with known type, known length */
 
-header_type genv_t {
-    fields {
-        ver : 2;
-        optLen : 6;
-        oam : 1;
-        critical : 1;
-        reserved : 6;
-        protoType : 16;
-        vni : 24;
-        reserved2 : 8;
-    }
+header genv_t {
+    bit<2> ver;
+    bit<6> optLen;
+    bit<1> oam;
+    bit<1> critical;
+    bit<6> reserved;
+    bit<16> protoType;
+    bit<24> vni;
+    bit<8> reserved2;
 }
 
 #define GENV_OPTION_A_TYPE 0x000001
 /* TODO: Would it be convenient to have some kind of sizeof macro ? */
 #define GENV_OPTION_A_LENGTH 2 /* in bytes */
 
-header_type genv_opt_A_t {
-    fields {
-        optClass : 16;
-        optType : 8;
-        reserved : 3;
-        optLen : 5;
-        data : 32;
-    }
+header genv_opt_A_t {
+    bit<16> optClass;
+    bit<8> optType;
+    bit<3> reserved;
+    bit<5> optLen;
+    bit<32> data;
 }
+
 
 #define GENV_OPTION_B_TYPE 0x000002
 #define GENV_OPTION_B_LENGTH 3 /* in bytes */
 
-header_type genv_opt_B_t {
-    fields {
-        optClass : 16;
-        optType : 8;
-        reserved : 3;
-        optLen : 5;
-        data : 64;
-    }
+header genv_opt_B_t {
+    bit<16> optClass;
+    bit<8> optType;
+    bit<3> reserved;
+    bit<5> optLen;
+    bit<64> data;
 }
 
 #define GENV_OPTION_C_TYPE 0x000003
 #define GENV_OPTION_C_LENGTH 2 /* in bytes */
 
-header_type genv_opt_C_t {
-    fields {
-        optClass : 16;
-        optType : 8;
-        reserved : 3;
-        optLen : 5;
-        data : 32;
-    }
+header genv_opt_C_t {
+    bit<16> optClass;
+    bit<8> optType;
+    bit<3> reserved;
+    bit<5> optLen;
+    bit<32> data;
 }
 
-header_type trill_t {
-    fields {
-        version : 2;
-        reserved : 2;
-        multiDestination : 1;
-        optLength : 5;
-        hopCount : 6;
-        egressRbridge : 16;
-        ingressRbridge : 16;
-    }
+header trill_t {
+    bit<2> version;
+    bit<2> reserved;
+    bit<1> multiDestination;
+    bit<5> optLength;
+    bit<6> hopCount;
+    bit<16> egressRbridge;
+    bit<16> ingressRbridge;
 }
 
-header_type lisp_t {
-    fields {
-        flags : 8;
-        nonce : 24;
-        lsbsInstanceId : 32;
-    }
+header lisp_t {
+    bit<8> flags;
+    bit<24> nonce;
+    bit<32> lsbsInstanceId;
 }
 
-header_type vntag_t {
-    fields {
-        direction : 1;
-        pointer : 1;
-        destVif : 14;
-        looped : 1;
-        reserved : 1;
-        version : 2;
-        srcVif : 12;
-    }
+header vntag_t {
+    bit<1> direction;
+    bit<1> pointer;
+    bit<14> destVif;
+    bit<1> looped;
+    bit<1> reserved;
+    bit<2> version;
+    bit<12> srcVif;
 }
 
-header_type bfd_t {
-    fields {
-        version : 3;
-        diag : 5;
-        state : 2;
-        p : 1;
-        f : 1;
-        c : 1;
-        a : 1;
-        d : 1;
-        m : 1;
-        detectMult : 8;
-        len : 8;
-        myDiscriminator : 32;
-        yourDiscriminator : 32;
-        desiredMinTxInterval : 32;
-        requiredMinRxInterval : 32;
-        requiredMinEchoRxInterval : 32;
-    }
+header bfd_t {
+    bit<3> version;
+    bit<5> diag;
+    bit<2> state;
+    bit<1> p;
+    bit<1> f;
+    bit<1> c;
+    bit<1> a;
+    bit<1> d;
+    bit<1> m;
+    bit<8> detectMult;
+    bit<8> len;
+    bit<32> myDiscriminator;
+    bit<32> yourDiscriminator;
+    bit<32> desiredMinTxInterval;
+    bit<32> requiredMinRxInterval;
+    bit<32> requiredMinEchoRxInterval;
 }
 
-header_type sflow_hdr_t {
-    fields {
-        version : 32;
-        addrType : 32;
-        ipAddress : 32;
-        subAgentId : 32;
-        seqNumber : 32;
-        uptime : 32;
-        numSamples : 32;
-    }
+header sflow_hdr_t {
+    bit<32> version;
+    bit<32> addrType;
+    bit<32> ipAddress;
+    bit<32> subAgentId;
+    bit<32> seqNumber;
+    bit<32> uptime;
+    bit<32> numSamples;
 }
 
-header_type sflow_sample_t {
-    fields {
-        enterprise : 20;
-        format : 12;
-        sampleLength : 32;
-        seqNumer : 32;
-        srcIdType : 8;
-        srcIdIndex : 24;
-        samplingRate : 32;
-        samplePool : 32;
-        numDrops : 32;
-        inputIfindex : 32;
-        outputIfindex : 32;
-        numFlowRecords : 32;
-    }
+header sflow_sample_t {
+    bit<20> enterprise;
+    bit<12> format;
+    bit<32> sampleLength;
+    bit<32> seqNumer;
+    bit<8> srcIdType;
+    bit<24> srcIdIndex;
+    bit<32> samplingRate;
+    bit<32> samplePool;
+    bit<32> numDrops;
+    bit<32> inputIfindex;
+    bit<32> outputIfindex;
+    bit<32> numFlowRecords;
 }
 
-header_type sflow_raw_hdr_record_t {
-    // this header is attached to each pkt sample (flow_record)
-    fields {
-        enterprise : 20;
-        format : 12;
-        flowDataLength : 32;
-        headerProtocol : 32;
-        frameLength : 32;
-        bytesRemoved : 32;
-        headerSize : 32;
-    }
+header sflow_raw_hdr_record_t {// this header is attached to each pkt sample (flow_record)
+
+    bit<20> enterprise;
+    bit<12> format;
+    bit<32> flowDataLength;
+    bit<32> headerProtocol;
+    bit<32> frameLength;
+    bit<32> bytesRemoved;
+    bit<32> headerSize;
 }
 
 
-header_type sflow_sample_cpu_t {
-    fields {
-        sampleLength        : 16;
-        samplePool          : 32;
-        inputIfindex        : 16;
-        outputIfindex       : 16;
-        numFlowRecords      : 8;
-        sflow_session_id    : 3;
-        pipe_id             : 2;
-    }
+header sflow_sample_cpu_t {
+    bit<16> sampleLength;
+    bit<32> samplePool;
+    bit<16> inputIfindex;
+    bit<16> outputIfindex;
+    bit<8> numFlowRecords;
+    bit<3> sflow_session_id;
+    bit<2> pipe_id;
 }
 
 #define FABRIC_HEADER_TYPE_NONE        0
@@ -460,158 +385,124 @@ header_type sflow_sample_cpu_t {
 #define FABRIC_HEADER_TYPE_CONTROL     4
 #define FABRIC_HEADER_TYPE_CPU         5
 
-header_type fabric_header_t {
-    fields {
-        packetType : 3;
-        headerVersion : 2;
-        packetVersion : 2;
-        pad1 : 1;
+header fabric_header_t {
+    bit<3> packetType;
+    bit<2> headerVersion;
+    bit<2> packetVersion;
+    bit<1> pad1;
 
-        fabricColor : 3;
-        fabricQos : 5;
+    bit<3> fabricColor;
+    bit<5> fabricQos;
 
-        dstDevice : 8;
-        dstPortOrGroup : 16;
-    }
+    bit<8> dstDevice;
+    bit<16> dstPortOrGroup;
 }
 
-header_type fabric_header_unicast_t {
-    fields {
-        routed : 1;
-        outerRouted : 1;
-        tunnelTerminate : 1;
-        ingressTunnelType : 5;
+header fabric_header_unicast_t {
+    bit<1> routed;
+    bit<1> outerRouted;
+    bit<1> tunnelTerminate;
+    bit<5> ingressTunnelType;
 
-        nexthopIndex : 16;
-    }
+    bit<16> nexthopIndex;
 }
 
-header_type fabric_header_multicast_t {
-    fields {
-        routed : 1;
-        outerRouted : 1;
-        tunnelTerminate : 1;
-        ingressTunnelType : 5;
+header fabric_header_multicast_t {
+    bit<1> routed;
+    bit<1> outerRouted;
+    bit<1> tunnelTerminate;
+    bit<5> ingressTunnelType;
 
-        ingressIfindex : 16;
-        ingressBd : 16;
+    bit<16> ingressIfindex;
+    bit<16> ingressBd;
 
-        mcastGrp : 16;
-    }
+    bit<16> mcastGrp;
 }
 
-header_type fabric_header_mirror_t {
-    fields {
-        rewriteIndex : 16;
-        egressPort : 10;
-        egressQueue : 5;
-        pad : 1;
-    }
+header fabric_header_mirror_t {
+    bit<16> rewriteIndex;
+    bit<10> egressPort;
+    bit<5> egressQueue;
+    bit<1> pad;
 }
 
-header_type fabric_header_cpu_t {
-    fields {
-        egressQueue : 5;
-        txBypass : 1;
-        reserved : 2;
+header fabric_header_cpu_t {
+    bit<5> egressQueue;
+    bit<1> txBypass;
+    bit<2> reserved;
 
-        ingressPort: 16;
-        ingressIfindex : 16;
-        ingressBd : 16;
+    bit<16> ingressPort;
+    bit<16> ingressIfindex;
+    bit<16> ingressBd;
 
-        reasonCode : 16;
-        mcast_grp : 16;
-    }
+    bit<16> reasonCode;
+    bit<16> mcast_grp;
 }
 
-header_type fabric_header_sflow_t {
-    fields {
-        sflow_session_id  : 16;
-        sflow_egress_ifindex : 16;
-    }
+header fabric_header_sflow_t {
+    bit<16> sflow_session_id;
+    bit<16> sflow_egress_ifindex;
 }
 
-header_type fabric_payload_header_t {
-    fields {
-        etherType : 16;
-    }
+header fabric_payload_header_t {
+    bit<16> etherType;
 }
 
 // INT headers
-header_type int_header_t {
-    fields {
-        ver                     : 2;
-        rep                     : 2;
-        c                       : 1;
-        e                       : 1;
-        rsvd1                   : 5;
-        ins_cnt                 : 5;
-        max_hop_cnt             : 8;
-        total_hop_cnt           : 8;
-        instruction_mask_0003   : 4;   // split the bits for lookup
-        instruction_mask_0407   : 4;
-        instruction_mask_0811   : 4;
-        instruction_mask_1215   : 4;
-        rsvd2                   : 16;
-    }
+header int_header_t {
+    bit<2> ver;
+    bit<2> rep;
+    bit<1> c;
+    bit<1> e;
+    bit<5> rsvd1;
+    bit<5> ins_cnt;
+    bit<8> max_hop_cnt;
+    bit<8> total_hop_cnt;
+    bit<4> instruction_mask_0003;   // split the bits for lookup
+    bit<4> instruction_mask_0407;
+    bit<4> instruction_mask_0811;
+    bit<4> instruction_mask_1215;
+    bit<16> rsvd2;
 }
 // INT meta-value headers - different header for each value type
-header_type int_switch_id_header_t {
-    fields {
-        bos                 : 1;
-        switch_id           : 31;
-    }
+header int_switch_id_header_t {
+    bit<1> bos;
+    bit<31> switch_id;
 }
-header_type int_ingress_port_id_header_t {
-    fields {
-        bos                 : 1;
-        ingress_port_id_1   : 15;
-        ingress_port_id_0   : 16;
-    }
+header int_ingress_port_id_header_t {
+    bit<1> bos;
+    bit<15> ingress_port_id_1;
+    bit<16> ingress_port_id_0;
 }
-header_type int_hop_latency_header_t {
-    fields {
-        bos                 : 1;
-        hop_latency         : 31;
-    }
+header int_hop_latency_header_t {
+    bit<1> bos;
+    bit<31> hop_latency;
 }
-header_type int_q_occupancy_header_t {
-    fields {
-        bos                 : 1;
-        q_occupancy1        : 7;
-        q_occupancy0        : 24;
-    }
+header int_q_occupancy_header_t {
+    bit<1> bos;
+    bit<7> q_occupancy1;
+    bit<24> q_occupancy0;
 }
-header_type int_ingress_tstamp_header_t {
-    fields {
-        bos                 : 1;
-        ingress_tstamp      : 31;
-    }
+header int_ingress_tstamp_header_t {
+    bit<1> bos;
+    bit<31> ingress_tstamp;
 }
-header_type int_egress_port_id_header_t {
-    fields {
-        bos                 : 1;
-        egress_port_id      : 31;
-    }
+header int_egress_port_id_header_t {
+    bit<1> bos;
+    bit<31> egress_port_id;
 }
-header_type int_q_congestion_header_t {
-    fields {
-        bos                 : 1;
-        q_congestion        : 31;
-    }
+header int_q_congestion_header_t {
+    bit<1> bos;
+    bit<31> q_congestion;
 }
-header_type int_egress_port_tx_utilization_header_t {
-    fields {
-        bos                         : 1;
-        egress_port_tx_utilization  : 31;
-    }
+header int_egress_port_tx_utilization_header_t {
+    bit<1> bos;
+    bit<31> egress_port_tx_utilization;
 }
 
 // generic int value (info) header for extraction
-header_type int_value_t {
-    fields {
-        bos         : 1;
-        val         : 31;
-    }
+header int_value_t {    
+    bit<1> bos;
+    bit<31> val;
 }
 

@@ -31,16 +31,9 @@ limitations under the License.
 #define egress_egress_port standard_metadata.egress_port
 #define intrinsic_mcast_grp intrinsic_metadata.mcast_grp
 
-header_type openflow_metadata_t {
-    fields {
-        index : 32;
-        bmap : 32;
-        group_id : 32;
-        ofvalid : 1;
-    }
-}
 
-metadata openflow_metadata_t openflow_metadata;
+
+
 
 #ifndef CPU_PORT_ID
     #define CPU_PORT_ID 64
@@ -53,60 +46,6 @@ metadata openflow_metadata_t openflow_metadata;
 
 #define FABRIC_HEADER_TYPE_MULTICAST   2
 #define FABRIC_HEADER_TYPE_CPU         5
-
-header_type fabric_header_t {
-    fields {
-        packetType : 3;
-        headerVersion : 2;
-        packetVersion : 2;
-        pad1 : 1;
-
-        fabricColor : 3;
-        fabricQos : 5;
-
-        dstDevice : 8;
-        dstPortOrGroup : 16;
-    }
-}
-
-header_type fabric_header_multicast_t {
-    fields {
-        routed : 1;
-        outerRouted : 1;
-        tunnelTerminate : 1;
-        ingressTunnelType : 5;
-
-        ingressIfindex : 16;
-        ingressBd : 16;
-
-        mcastGrp : 16;
-    }
-}
-
-header_type fabric_header_cpu_t {
-    fields {
-        egressQueue : 5;
-        txBypass : 1;
-        reserved : 2;
-
-        ingressPort: 16;
-        ingressIfindex : 16;
-        ingressBd : 16;
-
-        reasonCode : 16;
-    }
-}
-
-header_type fabric_payload_header_t {
-    fields {
-        etherType : 16;
-    }
-}
-
-header fabric_header_t fabric_header;
-header fabric_header_cpu_t fabric_header_cpu;
-header fabric_header_multicast_t fabric_header_multicast;
-header fabric_payload_header_t fabric_payload_header;
 
 
 parser parse_fabric_header {
@@ -145,30 +84,25 @@ action nop () {
 // assume you've named your ethernet header "ethernet" :) )
 
 action terminate_cpu_packet() {
-    modify_field(ingress_egress_port,
-                 fabric_header.dstPortOrGroup);
-//    modify_field(egress_metadata.bypass, fabric_header_cpu.txBypass);
+    ingress_egress_port = fabric_header.dstPortOrGroup;
+//    egress_metadata.bypass = fabric_header_cpu.txBypass;
 
-    modify_field(ethernet.etherType, fabric_payload_header.etherType);
+    ethernet.etherType = fabric_payload_header.etherType;
     remove_header(fabric_header);
     remove_header(fabric_header_cpu);
     remove_header(fabric_payload_header);
 }
 
 action terminate_fabric_multicast_packet() {
-//    modify_field(tunnel_metadata.tunnel_terminate,
-//                 fabric_header_multicast.tunnelTerminate);
-//    modify_field(tunnel_metadata.ingress_tunnel_type,
-//                 fabric_header_multicast.ingressTunnelType);
-//    modify_field(l3_metadata.nexthop_index, 0);
-//    modify_field(l3_metadata.routed, fabric_header_multicast.routed);
-//    modify_field(l3_metadata.outer_routed,
-//                 fabric_header_multicast.outerRouted);
+//    tunnel_metadata.tunnel_terminate = fabric_header_multicast.tunnelTerminate;
+//    tunnel_metadata.ingress_tunnel_type = fabric_header_multicast.ingressTunnelType;
+//    l3_metadata.nexthop_index = 0;
+//    l3_metadata.routed = fabric_header_multicast.routed;
+//    l3_metadata.outer_routed = fabric_header_multicast.outerRouted;
 
-    modify_field(intrinsic_mcast_grp,
-                 fabric_header_multicast.mcastGrp);
+    intrinsic_mcast_grp = fabric_header_multicast.mcastGrp;
 
-    modify_field(ethernet.etherType, fabric_payload_header.etherType);
+    ethernet.etherType = fabric_payload_header.etherType;
     remove_header(fabric_header);
     remove_header(fabric_header_multicast);
     remove_header(fabric_payload_header);
@@ -193,11 +127,11 @@ table packet_out {
  ****************************************************************/
 
 action openflow_apply(bmap, index, group_id) {
-    modify_field(openflow_metadata.bmap, bmap);
-    modify_field(openflow_metadata.index, index);
-    modify_field(openflow_metadata.group_id, group_id);
-    modify_field(openflow_metadata.ofvalid, TRUE);
-//    modify_field(egress_metadata.bypass, TRUE);
+    openflow_metadata.bmap = bmap;
+    openflow_metadata.index = index;
+    openflow_metadata.group_id = group_id;
+    openflow_metadata.ofvalid = TRUE;
+//    egress_metadata.bypass = TRUE;
 }
 
 action openflow_miss(reason, table_id) {
@@ -206,17 +140,17 @@ action openflow_miss(reason, table_id) {
     add_header(fabric_header_cpu);
     add_header(fabric_payload_header);
     
-    modify_field(fabric_metadata.etherType, ethernet.etherType);
+    fabric_metadata.etherType = ethernet.etherType;
 
-    modify_field(fabric_metadata.ingressPort, ingress_input_port);
+    fabric_metadata.ingressPort = ingress_input_port;
 #endif
 
-    modify_field(fabric_metadata.reason_code, reason);
+    fabric_metadata.reason_code = reason;
 
     shift_left(fabric_metadata.reason_code, fabric_metadata.reason_code, 8);
     bit_or(fabric_metadata.reason_code, fabric_metadata.reason_code, table_id);
 
-    modify_field(ingress_egress_port, CPU_PORT_ID);
+    ingress_egress_port = CPU_PORT_ID;
 }
 
 /****************************************************************
@@ -244,11 +178,11 @@ table ofpat_group_egress {
  ****************************************************************/
 
 action ofpat_group_ingress_uc(ifindex) {
-    modify_field(ingress_egress_port, ifindex);
+    ingress_egress_port = ifindex;
 }
 
 action ofpat_group_ingress_mc(mcindex) {
-    modify_field(intrinsic_mcast_grp, mcindex);
+    intrinsic_mcast_grp = mcindex;
 }
 
 table ofpat_group_ingress {
@@ -268,9 +202,9 @@ table ofpat_group_ingress {
  ****************************************************************/
 
 action ofpat_output(egress_port) {
-    modify_field(ingress_egress_port, egress_port);
+    ingress_egress_port = egress_port;
 // for switch.p4
-    modify_field(ingress_metadata.egress_ifindex, 0);
+    ingress_metadata.egress_ifindex = 0;
 }
 
 table ofpat_output {
@@ -292,7 +226,7 @@ table ofpat_output {
  ***************************************************************/
 
 action ofpat_set_mpls_ttl(ttl) {
-    modify_field(mpls[0].ttl, ttl);
+    mpls[0].ttl = ttl;
 }
 
 table ofpat_set_mpls_ttl {
@@ -334,7 +268,7 @@ table ofpat_dec_mpls_ttl {
  ****************************************************************/
 
 action ofpat_push_mpls() {
-    modify_field(ethernet.etherType, 0x8847);
+    ethernet.etherType = 0x8847;
     add_header(mpls[0]);
 }
 
@@ -378,9 +312,9 @@ table ofpat_pop_mpls {
  ***************************************************************/
 
 action ofpat_push_vlan() {
-    modify_field(ethernet.etherType, 0x8100);
+    ethernet.etherType = 0x8100;
     add_header(vlan_tag_[0]);
-    modify_field(vlan_tag_[0].etherType, 0x0800);
+    vlan_tag_[0].etherType = 0x0800;
 }
 
 table ofpat_push_vlan {
@@ -401,7 +335,7 @@ table ofpat_push_vlan {
  ***************************************************************/
 
 action ofpat_pop_vlan() {
-    modify_field(ethernet.etherType, vlan_tag_[0].etherType);
+    ethernet.etherType = vlan_tag_[0].etherType;
     remove_header(vlan_tag_[0]);
 }
 
@@ -423,7 +357,7 @@ table ofpat_pop_vlan {
  ***************************************************************/
 
 action ofpat_set_vlan_vid(vid) {
-    modify_field(vlan_tag_[0].vid, vid);
+    vlan_tag_[0].vid = vid;
 }
 
 table ofpat_set_field {
@@ -454,7 +388,7 @@ table ofpat_set_field {
  ***************************************************************/
 
 action ofpat_set_nw_ttl_ipv4(ttl) {
-    modify_field(ipv4.ttl, ttl);
+    ipv4.ttl = ttl;
 }
 
 table ofpat_set_nw_ttl_ipv4 {
@@ -475,7 +409,7 @@ table ofpat_set_nw_ttl_ipv4 {
  ***************************************************************/
 
 action ofpat_set_nw_ttl_ipv6(ttl) {
-    modify_field(ipv6.hopLimit, ttl);
+    ipv6.hopLimit = ttl;
 }
 
 table ofpat_set_nw_ttl_ipv6 {
@@ -538,7 +472,7 @@ table ofpat_dec_nw_ttl_ipv6 {
  * Main control block
  ***************************************************************/
 
-control process_ofpat_ingress {
+control process_ofpat_ingress (inout headers_t hdr, inout metadata_t meta, inout standard_metadata_t standard_metadata) { 
     if (openflow_metadata.bmap & 0x400000 == 0x400000) {
         apply(ofpat_group_ingress);
     }

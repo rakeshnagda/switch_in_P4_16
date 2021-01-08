@@ -1,0 +1,32 @@
+p4_files = \
+$(top_srcdir)/switch_src/acl.p4 \
+$(top_srcdir)/switch_src/archdeps.p4 \
+$(top_srcdir)/switch_src/egress_filter.p4 \
+$(top_srcdir)/switch_src/fabric.p4 \
+$(top_srcdir)/switch_src/hashes.p4 \
+$(top_srcdir)/switch_src/int_transit.p4 \
+$(top_srcdir)/switch_src/ipv4.p4 \
+$(top_srcdir)/switch_src/ipv6.p4 \
+$(top_srcdir)/switch_src/l2.p4 \
+$(top_srcdir)/switch_src/l3.p4 \
+$(top_srcdir)/switch_src/meter.p4 \
+$(top_srcdir)/switch_src/mirror.p4 \
+$(top_srcdir)/switch_src/multicast.p4 \
+$(top_srcdir)/switch_src/nexthop.p4 \
+$(top_srcdir)/switch_src/openflow.p4 \
+$(top_srcdir)/switch_src/port.p4 \
+$(top_srcdir)/switch_src/rewrite.p4 \
+$(top_srcdir)/switch_src/security.p4 \
+$(top_srcdir)/switch_src/switch_config.p4 \
+$(top_srcdir)/switch_src/switch.p4 \
+$(top_srcdir)/switch_src/tunnel.p4 \
+$(top_srcdir)/includes/defines.p4 \
+$(top_srcdir)/includes/drop_reasons.h \
+$(top_srcdir)/includes/headers.p4 \
+$(top_srcdir)/includes/intrinsic.p4 \
+$(top_srcdir)/includes/p4features.h \
+$(top_srcdir)/includes/parser.p4 \
+$(top_srcdir)/includes/sizes.p4 \
+$(top_srcdir)/includes/metadata.p4 \
+$(top_srcdir)/includes/header_collection.p4 \
+$(top_srcdir)/includes/actions.p4

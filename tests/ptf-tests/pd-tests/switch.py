@@ -39,6 +39,12 @@ sys.path.append(os.path.join(this_dir, '..'))
 from common.utils import *
 from common.pd_utils import *
 
+# ----------NTF--------------------
+from ntf import config
+from time import sleep
+from mininet.cli import CLI
+# ------------------------------
+
 #global defaults
 inner_rmac_group = 1
 outer_rmac_group = 2
@@ -55,6 +61,68 @@ multicast_enabled = 1
 stats_enabled = 1
 int_enabled = 1
 learn_timeout = 6
+
+
+@group("L2TestSmall")
+class L2TestSmall(pd_base_tests.ThriftInterfaceDataPlane):
+    def __init__(self):
+        pd_base_tests.ThriftInterfaceDataPlane.__init__(self, "dc")
+
+    def runTest(self):
+        sess_hdl = self.conn_mgr.client_init()
+        dev_tgt = DevTarget_t(0, hex_to_i16(0xFFFF))
+        device = 0
+
+        client_init(self.client, sess_hdl, dev_tgt)
+
+        #Add the default entries
+        populate_default_entries(self.client, sess_hdl, dev_tgt, ipv6_enabled,
+                                acl_enabled, tunnel_enabled, multicast_enabled,
+                                int_enabled)
+        ret_init = populate_init_entries(self.client, sess_hdl, dev_tgt,
+                                        rewrite_index, rmac, inner_rmac_group,
+                                        outer_rmac_group, ipv6_enabled, tunnel_enabled)
+
+        #Create two ports
+        ret_list = program_ports(self.client, sess_hdl, dev_tgt, 2)
+
+        vlan=0
+
+        #Add static macs to ports. (vlan, mac -> port)
+        dmac_hdl1, smac_hdl1 = program_mac(self.client, sess_hdl, dev_tgt, vlan, '00:11:11:11:11:11', 1)
+        dmac_hdl2, smac_hdl2 = program_mac(self.client, sess_hdl, dev_tgt, vlan, '00:22:22:22:22:22', 2)
+
+        self.conn_mgr.complete_operations(sess_hdl)
+
+        print "Sending packet port 1 -> port 2 on vlan 10 (192.168.0.1 -> 10.0.0.1 [id = 101])"
+        pkt = simple_tcp_packet(eth_dst='00:22:22:22:22:22',
+                                eth_src='00:11:11:11:11:11',
+                                ip_id=101,
+                                ip_ttl=64,
+                                ip_ihl=5)
+        try:
+            ret = send_packet(self, 1, str(pkt))
+            print "entering verification";
+            print ret;
+            ret1 = verify_packets(self, pkt, [2])
+            print "after verification";
+            print ret1;
+        finally:
+            delete_default_entries(self.client, sess_hdl, device)
+
+            delete_mac(self.client, sess_hdl, device, dmac_hdl2, smac_hdl2)
+            delete_mac(self.client, sess_hdl, device, dmac_hdl1, smac_hdl1)
+
+            # delete ports
+            delete_ports(self.client, sess_hdl, device, 2, ret_list)
+
+            # delete  init and default entries
+            delete_init_entries(self.client, sess_hdl, device, ret_init,
+                                tunnel_enabled)
+
+            self.conn_mgr.complete_operations(sess_hdl)
+            self.conn_mgr.client_cleanup(sess_hdl)
+
 
 #Basic L2 Test case
 @group("L2Test")
@@ -116,8 +184,12 @@ class L2Test(pd_base_tests.ThriftInterfaceDataPlane):
                                 ip_ttl=64,
                                 ip_ihl=5)
         try:
-            send_packet(self, 1, str(pkt))
-            verify_packets(self, pkt, [2])
+            ret = send_packet(self, 1, str(pkt))
+            print "entering verification";
+            print ret;
+            ret1 = verify_packets(self, pkt, [2])
+            print "after verification";
+            print ret1;
         finally:
             delete_default_entries(self.client, sess_hdl, device)
 
@@ -142,6 +214,7 @@ class L2Test(pd_base_tests.ThriftInterfaceDataPlane):
 
 
 #Basic L3 Test case
+@group("L3Ipv4Test")
 class L3Ipv4Test(pd_base_tests.ThriftInterfaceDataPlane):
     def __init__(self):
         pd_base_tests.ThriftInterfaceDataPlane.__init__(self, "dc")

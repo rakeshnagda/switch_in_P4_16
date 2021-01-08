@@ -1,5 +1,5 @@
-/*
-Copyright 2013-present Barefoot Networks, Inc. 
+
+/*Copyright 2013-present Barefoot Networks, Inc. 
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -114,7 +114,7 @@ limitations under the License.
 #define BYPASS_ALL                             0xFFFF
 
 #define DO_LOOKUP(l) \
-    ((ingress_metadata.bypass_lookups & BYPASS_##l) == 0)
+    ((meta.ingress_metadata.bypass_lookups & BYPASS_##l) == 0)
 
 #define BYPASS_ALL_LOOKUPS \
-    (ingress_metadata.bypass_lookups == BYPASS_ALL)
+    (meta.ingress_metadata.bypass_lookups == BYPASS_ALL)

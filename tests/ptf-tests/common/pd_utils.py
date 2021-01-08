@@ -59,7 +59,7 @@ def set_port_or_lag_bitmap(bit_map_size, indicies):
 
 def populate_default_fabric_entries(client, sess_hdl, dev_tgt, ipv6_enabled=0,
                                     acl_enabled=0, tunnel_enabled=0):
-    client.validate_outer_ethernet_set_default_action_set_valid_outer_unicast_packet_untagged(
+    client.ingress_validate_outer_header_validate_outer_ethernet_set_default_action_ingress_validate_outer_header_set_valid_outer_unicast_packet_untagged(
         sess_hdl, dev_tgt)
     client.validate_outer_ipv4_packet_set_default_action_set_valid_outer_ipv4_packet(
         sess_hdl, dev_tgt)
@@ -73,7 +73,8 @@ def populate_default_fabric_entries(client, sess_hdl, dev_tgt, ipv6_enabled=0,
     client.ipv4_fib_set_default_action_on_miss(sess_hdl, dev_tgt)
     client.fwd_result_set_default_action_nop(sess_hdl, dev_tgt)
     client.nexthop_set_default_action_nop(sess_hdl, dev_tgt)
-    #client.egress_internal_header_rewrite_set_default_action_strip_internal_header(
+    # It was already commented
+    # client.egress_internal_header_rewrite_set_default_action_strip_internal_header(
     #    sess_hdl, dev_tgt)
     client.fabric_ingress_dst_lkp_set_default_action_nop(sess_hdl, dev_tgt)
     client.fabric_ingress_src_lkp_set_default_action_nop(sess_hdl, dev_tgt)
@@ -150,46 +151,54 @@ def populate_default_fabric_entries(client, sess_hdl, dev_tgt, ipv6_enabled=0,
 def populate_default_entries(client, sess_hdl, dev_tgt, ipv6_enabled,
     acl_enabled, tunnel_enabled, multicast_enabled, int_enabled):
     index = 0
-    action_spec = dc_set_config_parameters_action_spec_t(
+    action_spec = dc_ingress_global_params_set_config_parameters_action_spec_t(
                                     action_enable_dod=0)
-    client.switch_config_params_set_default_action_set_config_parameters(
-                                     sess_hdl, dev_tgt, action_spec)
-    client.validate_outer_ethernet_set_default_action_set_valid_outer_unicast_packet_untagged(
+    # action_spec = dc_set_config_parameters_action_spec_t(
+    #                                 action_enable_dod=0)
+    client.ingress_global_params_switch_config_params_set_default_action_ingress_global_params_set_config_parameters(
+                                        sess_hdl, dev_tgt, action_spec)
+    # client.switch_config_params_set_default_action_set_config_parameters(
+    #                                  sess_hdl, dev_tgt, action_spec)
+    client.ingress_validate_outer_header_validate_outer_ethernet_set_default_action_ingress_validate_outer_header_set_valid_outer_unicast_packet_untagged(
                                      sess_hdl, dev_tgt)
-    client.validate_outer_ipv4_packet_set_default_action_set_valid_outer_ipv4_packet(
+    # client.validate_outer_ethernet_set_default_action_set_valid_outer_unicast_packet_untagged(
+    #                                  sess_hdl, dev_tgt)
+    client.ingress_validate_outer_header_validate_outer_ipv4_header_instance_validate_outer_ipv4_packet_set_default_action_ingress_validate_outer_header_validate_outer_ipv4_header_instance_set_valid_outer_ipv4_packet(
                                      sess_hdl, dev_tgt)
+    # client.validate_outer_ipv4_packet_set_default_action_set_valid_outer_ipv4_packet(
+    #                                  sess_hdl, dev_tgt)
     if ipv6_enabled:
-        client.validate_outer_ipv6_packet_set_default_action_set_valid_outer_ipv6_packet(
+        client.ingress_validate_outer_header_validate_outer_ipv6_header_instance_validate_outer_ipv6_packet_set_default_action_ingress_validate_outer_header_validate_outer_ipv6_header_instance_set_valid_outer_ipv6_packet(
                                      sess_hdl, dev_tgt)
-    client.smac_set_default_action_smac_miss(
+    client.ingress_mac_smac_set_default_action_ingress_mac_smac_miss(
                                      sess_hdl, dev_tgt)
-    client.dmac_set_default_action_dmac_miss(
+    client.ingress_mac_dmac_set_default_action_ingress_mac_dmac_miss(
                                      sess_hdl, dev_tgt)
-    client.learn_notify_set_default_action_nop(
+    client.ingress_mac_learning_learn_notify_set_default_action_ingress_mac_learning_nop(
                                      sess_hdl, dev_tgt)
-    client.rmac_set_default_action_rmac_miss(
+    client.ingress_rmac_set_default_action_ingress_rmac_miss(
                                      sess_hdl, dev_tgt)
-    client.ipv4_fib_set_default_action_on_miss(
+    client.ingress_ipv4_fib_ipv4_fib_set_default_action_ingress_ipv4_fib_on_miss(
                                      sess_hdl, dev_tgt)
-    client.fwd_result_set_default_action_nop(
+    client.ingress_fwd_results_fwd_result_set_default_action_ingress_fwd_results_nop(
                                      sess_hdl, dev_tgt)
-    client.nexthop_set_default_action_nop(
+    client.ingress_nexthop_nexthop_set_default_action_ingress_nexthop_nop(
                                      sess_hdl, dev_tgt)
-    client.rid_set_default_action_nop(
+    client.egress_replication_rid_set_default_action_egress_replication_nop(
                                      sess_hdl, dev_tgt)
-    client.rewrite_set_default_action_nop(
+    client.egress_mac_rewrite_l3_rewrite_set_default_action_egress_mac_rewrite_nop(
                                      sess_hdl, dev_tgt)
-    client.egress_vlan_xlate_set_default_action_set_egress_packet_vlan_untagged(
+    client.egress_vlan_xlate_egress_vlan_xlate_set_default_action_egress_vlan_xlate_set_egress_packet_vlan_untagged(
                                      sess_hdl, dev_tgt)
-    client.egress_filter_set_default_action_egress_filter_check(
+    client.egress_egress_filter_egress_filter_set_default_action_egress_egress_filter_egress_filter_check(
                                      sess_hdl, dev_tgt)
-    client.egress_filter_drop_set_default_action_set_egress_filter_drop(
+    client.egress_egress_filter_egress_filter_drop_set_default_action_egress_egress_filter_set_egress_filter_drop(
                                      sess_hdl, dev_tgt)
-    client.validate_packet_set_default_action_nop(
+    client.ingress_validate_packet_validate_packet_set_default_action_ingress_validate_packet_nop(
                                      sess_hdl, dev_tgt)
-    client.storm_control_set_default_action_nop(
+    client.ingress_storm_control_storm_control_set_default_action_ingress_storm_control_nop(
                                      sess_hdl, dev_tgt)
-    client.storm_control_stats_set_default_action_nop(
+    client.ingress_storm_control_stats_storm_control_stats_set_default_action_ingress_storm_control_stats_nop(
                                      sess_hdl, dev_tgt)
     meter_spec = dc_bytes_meter_spec_t(
                              cir_kbps=0,
@@ -197,154 +206,154 @@ def populate_default_entries(client, sess_hdl, dev_tgt, ipv6_enabled,
                              pir_kbps=0,
                              pburst_kbits=0,
                              color_aware=False)
-    client.meter_index_set_default_action_nop(
+    client.ingress_meter_index_meter_index_set_default_action_ingress_meter_index_nop0(
                                      sess_hdl, dev_tgt, meter_spec)
-    client.meter_action_set_default_action_meter_permit(
+    client.ingress_meter_action_meter_action_set_default_action_ingress_meter_action_meter_permit(
                                      sess_hdl, dev_tgt)
 
-    client.vlan_decap_set_default_action_nop(
+    client.egress_vlan_decap_vlan_decap_set_default_action_egress_vlan_decap_nop(
                                      sess_hdl, dev_tgt)
-    client.replica_type_set_default_action_nop(
+    client.egress_replication_replica_type_set_default_action_egress_replication_nop(
                                      sess_hdl, dev_tgt)
-    client.rewrite_set_default_action_set_l2_rewrite(
+    client.egress_rewrite_rewrite_set_default_action_egress_rewrite_set_l2_rewrite(
                                      sess_hdl, dev_tgt)
-    action_spec = dc_egress_port_type_normal_action_spec_t(
+    action_spec = dc_egress_egress_port_type_normal_action_spec_t(
                                      action_ifindex=0,
                                      action_qos_group=0,
                                      action_if_label=0)
-    client.egress_port_mapping_set_default_action_egress_port_type_normal(
+    client.egress_egress_port_mapping_set_default_action_egress_egress_port_type_normal(
                                      sess_hdl, dev_tgt, action_spec)
-    client.mtu_set_default_action_mtu_miss(
+    client.egress_mtu_mtu_set_default_action_egress_mtu_mtu_miss(
                                      sess_hdl, dev_tgt)
 
-    mbr_hdl = client.fabric_lag_action_profile_add_member_with_nop(
+    mbr_hdl = client.ingress_fabric_lag_act_selector_add_member_with_NoAction(
                                      sess_hdl, dev_tgt)
-    client.fabric_lag_set_default_entry(
+    client.ingress_fabric_lag_fabric_lag_set_default_entry(
                                      sess_hdl, dev_tgt, mbr_hdl)
-    entry_hdl = client.compute_ipv4_hashes_set_default_action_compute_lkp_ipv4_hash(
+    entry_hdl = client.ingress_hashes_compute_ipv4_hashes_set_default_action_ingress_hashes_compute_lkp_ipv4_hash(
                                      sess_hdl, dev_tgt)
-    entry_hdl = client.compute_ipv6_hashes_set_default_action_compute_lkp_ipv6_hash(
+    entry_hdl = client.ingress_hashes_compute_ipv6_hashes_set_default_action_ingress_hashes_compute_lkp_ipv6_hash(
                                      sess_hdl, dev_tgt)
-    entry_hdl = client.compute_non_ip_hashes_set_default_action_compute_lkp_non_ip_hash(
+    entry_hdl = client.ingress_hashes_compute_non_ip_hashes_set_default_action_ingress_hashes_compute_lkp_non_ip_hash(
                                      sess_hdl, dev_tgt)
-    entry_hdl = client.compute_other_hashes_set_default_action_computed_two_hashes(
+    entry_hdl = client.ingress_hashes_compute_other_hashes_set_default_action_ingress_hashes_computed_two_hashes(
                                      sess_hdl, dev_tgt)
-    client.system_acl_set_default_action_nop(
+    client.egress_egress_system_acl_egress_system_acl_set_default_action_egress_egress_system_acl_nop(
                                      sess_hdl, dev_tgt)
-    client.adjust_lkp_fields_set_default_action_non_ip_lkp(
+    client.ingress_tunnel_adjust_lkp_fields_set_default_action_ingress_tunnel_non_ip_lkp(
                                      sess_hdl, dev_tgt)
-    match_spec = dc_adjust_lkp_fields_match_spec_t(ipv4_valid=1, ipv6_valid=0)
-    client.adjust_lkp_fields_table_add_with_ipv4_lkp(
+    match_spec = dc_ingress_tunnel_adjust_lkp_fields_match_spec_t(ipv4_valid=1, ipv6_valid=0)
+    client.ingress_tunnel_adjust_lkp_fields_table_add_with_ingress_tunnel_ipv4_lkp(
                                      sess_hdl, dev_tgt, match_spec)
-    match_spec = dc_adjust_lkp_fields_match_spec_t(ipv4_valid=0, ipv6_valid=1)
-    client.adjust_lkp_fields_table_add_with_ipv6_lkp(
+    match_spec = dc_ingress_tunnel_adjust_lkp_fields_match_spec_t(ipv4_valid=0, ipv6_valid=1)
+    client.ingress_tunnel_adjust_lkp_fields_table_add_with_ingress_tunnel_ipv6_lkp(
                                      sess_hdl, dev_tgt, match_spec)
-    client.sflow_ingress_set_default_action_nop(
+    client.ingress_ingress_sflow_sflow_ingress_set_default_action_ingress_ingress_sflow_nop(
                                      sess_hdl, dev_tgt)
-    client.sflow_ing_take_sample_set_default_action_nop(
+    client.ingress_ingress_sflow_sflow_ing_take_sample_set_default_action_ingress_ingress_sflow_nop(
                                      sess_hdl, dev_tgt)
 
     if acl_enabled:
-        client.ip_acl_set_default_action_nop(
+        client.egress_egress_acl_egress_ip_acl_set_default_action_egress_egress_acl_nop(
                                      sess_hdl, dev_tgt)
-        client.ipv4_racl_set_default_action_nop(
+        client.ingress_ipv4_racl_ipv4_racl_set_default_action_ingress_ipv4_racl_nop(
                                      sess_hdl, dev_tgt)
-        client.egress_system_acl_set_default_action_nop(
+        client.egress_egress_system_acl_egress_system_acl_set_default_action_egress_egress_system_acl_nop(
                                      sess_hdl, dev_tgt)
-        client.acl_stats_set_default_action_acl_stats_update(
+        client.ingress_ingress_acl_stats_acl_stats_set_default_action_ingress_ingress_acl_stats_acl_stats_update(
                                      sess_hdl, dev_tgt)
     if tunnel_enabled:
-        client.outer_rmac_set_default_action_on_miss(
+        client.ingress_tunnel_outer_rmac_set_default_action_ingress_tunnel_on_miss(
                                      sess_hdl, dev_tgt)
-        client.ipv4_src_vtep_set_default_action_on_miss(
+        client.ingress_tunnel_process_ipv4_vtep_ipv4_src_vtep_set_default_action_ingress_tunnel_process_ipv4_vtep_on_miss(
                                      sess_hdl, dev_tgt)
-        client.ipv4_dest_vtep_set_default_action_nop(
+        client.ingress_tunnel_process_ipv4_vtep_ipv4_dest_vtep_set_default_action_ingress_tunnel_process_ipv4_vtep_nop(
                                      sess_hdl, dev_tgt)
-        client.tunnel_mtu_set_default_action_tunnel_mtu_miss(
+        client.egress_tunnel_encap_tunnel_mtu_set_default_action_egress_tunnel_encap_tunnel_mtu_miss(
                                      sess_hdl, dev_tgt)
-    client.egress_bd_map_set_default_action_nop(
+    client.egress_egress_bd_egress_bd_map_set_default_action_egress_egress_bd_nop(
                                      sess_hdl, dev_tgt)
     if ipv6_enabled and tunnel_enabled:
-        client.ipv6_src_vtep_set_default_action_on_miss(
+        client.ingress_tunnel_process_ipv6_vtep_ipv6_src_vtep_set_default_action_ingress_tunnel_process_ipv6_vtep_on_miss(
                                      sess_hdl, dev_tgt)
-        client.ipv6_dest_vtep_set_default_action_nop(
+        client.ingress_tunnel_process_ipv6_vtep_ipv6_dest_vtep_set_default_action_ingress_tunnel_process_ipv6_vtep_nop(
                                      sess_hdl, dev_tgt)
     if ipv6_enabled and acl_enabled:
-        client.ipv6_acl_set_default_action_nop(
+        client.egress_egress_acl_egress_ipv6_acl_set_default_action_egress_egress_acl_nop(
                                      sess_hdl, dev_tgt)
-        client.ipv6_racl_set_default_action_nop(
+        client.ingress_ipv6_racl_ipv6_racl_set_default_action_ingress_ipv6_racl_nop(
                                      sess_hdl, dev_tgt)
 
     if multicast_enabled:
         if tunnel_enabled:
-            client.outer_ipv4_multicast_set_default_action_on_miss(
+            client.ingress_tunnel_process_outer_multicast_instance_process_outer_ipv4_multicast_instance_outer_ipv4_multicast_set_default_action_ingress_tunnel_process_outer_multicast_instance_process_outer_ipv4_multicast_instance_on_miss(
                                      sess_hdl, dev_tgt)
-            client.outer_ipv4_multicast_star_g_set_default_action_nop(
+            client.ingress_tunnel_process_outer_multicast_instance_process_outer_ipv4_multicast_instance_outer_ipv4_multicast_star_g_set_default_action_ingress_tunnel_process_outer_multicast_instance_process_outer_ipv4_multicast_instance_nop(
                                      sess_hdl, dev_tgt)
-        client.ipv4_multicast_bridge_set_default_action_on_miss(
+        client.ingress_multicast_process_ipv4_multicast_instance_ipv4_multicast_bridge_set_default_action_ingress_multicast_process_ipv4_multicast_instance_on_miss(
                                      sess_hdl, dev_tgt)
-        client.ipv4_multicast_bridge_star_g_set_default_action_nop(
+        client.ingress_multicast_process_ipv4_multicast_instance_ipv4_multicast_bridge_star_g_set_default_action_ingress_multicast_process_ipv4_multicast_instance_nop(
                                      sess_hdl, dev_tgt)
-        client.ipv4_multicast_route_set_default_action_on_miss(
+        client.ingress_multicast_process_ipv4_multicast_instance_ipv4_multicast_route_set_default_action_ingress_multicast_process_ipv4_multicast_instance_on_miss(
                                      sess_hdl, dev_tgt)
-        client.ipv4_multicast_route_star_g_set_default_action_multicast_route_star_g_miss(
+        client.ingress_multicast_process_ipv4_multicast_instance_ipv4_multicast_route_star_g_set_default_action_ingress_multicast_process_ipv4_multicast_instance_multicast_route_star_g_miss(
                                      sess_hdl, dev_tgt)
         if ipv6_enabled:
             if tunnel_enabled:
-                client.outer_ipv6_multicast_set_default_action_on_miss(
+                client.ingress_tunnel_process_outer_multicast_instance_process_outer_ipv6_multicast_instance_outer_ipv6_multicast_set_default_action_ingress_tunnel_process_outer_multicast_instance_process_outer_ipv6_multicast_instance_on_miss(
                                      sess_hdl, dev_tgt)
-                client.outer_ipv6_multicast_star_g_set_default_action_nop(
+                client.ingress_tunnel_process_outer_multicast_instance_process_outer_ipv6_multicast_instance_outer_ipv6_multicast_star_g_set_default_action_ingress_tunnel_process_outer_multicast_instance_process_outer_ipv6_multicast_instance_nop(
                                      sess_hdl, dev_tgt)
-            client.ipv6_multicast_bridge_set_default_action_on_miss(
+            client.ingress_multicast_process_ipv6_multicast_instance_ipv6_multicast_bridge_set_default_action_ingress_multicast_process_ipv6_multicast_instance_on_miss(
                                      sess_hdl, dev_tgt)
-            client.ipv6_multicast_bridge_star_g_set_default_action_nop(
+            client.ingress_multicast_process_ipv6_multicast_instance_ipv6_multicast_bridge_star_g_set_default_action_ingress_multicast_process_ipv6_multicast_instance_nop(
                                      sess_hdl, dev_tgt)
-            client.ipv6_multicast_route_set_default_action_on_miss(
+            client.ingress_multicast_process_ipv6_multicast_instance_ipv6_multicast_route_set_default_action_ingress_multicast_process_ipv6_multicast_instance_on_miss(
                                      sess_hdl, dev_tgt)
-            client.ipv6_multicast_route_star_g_set_default_action_multicast_route_star_g_miss(
+            client.ingress_multicast_process_ipv6_multicast_instance_ipv6_multicast_route_star_g_set_default_action_ingress_multicast_process_ipv6_multicast_instance_multicast_route_star_g_miss(
                                      sess_hdl, dev_tgt)
 
-    client.egress_qos_map_set_default_action_nop(
+    client.egress_egress_qos_map_egress_qos_map_set_default_action_egress_egress_qos_map_nop(
                                      sess_hdl, dev_tgt)
-    client.ingress_qos_map_dscp_set_default_action_nop(
+    client.ingress_ingress_qos_map_ingress_qos_map_dscp_set_default_action_ingress_ingress_qos_map_nop(
                                      sess_hdl, dev_tgt)
-    client.ingress_qos_map_pcp_set_default_action_nop(
+    client.ingress_ingress_qos_map_ingress_qos_map_pcp_set_default_action_ingress_ingress_qos_map_nop(
                                      sess_hdl, dev_tgt)
-    client.traffic_class_set_default_action_nop(
+    client.ingress_traffic_class_traffic_class_set_default_action_ingress_traffic_class_nop(
                                      sess_hdl, dev_tgt)
 
     if stats_enabled:
-        client.ingress_bd_stats_set_default_action_update_ingress_bd_stats(
+        client.ingress_ingress_bd_stats_ingress_bd_stats_set_default_action_ingress_ingress_bd_stats_update_ingress_bd_stats(
                                      sess_hdl, dev_tgt)
-        client.egress_bd_stats_set_default_action_nop(
+        client.egress_egress_bd_stats_egress_bd_stats_set_default_action_egress_egress_bd_stats_nop(
                                      sess_hdl, dev_tgt)
 
     if int_enabled:
-        client.int_terminate_set_default_action_int_no_sink(sess_hdl, dev_tgt)
-        client.int_sink_update_outer_set_default_action_nop(sess_hdl, dev_tgt)
-        client.int_insert_set_default_action_int_reset(sess_hdl, dev_tgt)
+        client.ingress_int_endpoint_int_terminate_set_default_action_ingress_int_endpoint_int_no_sink(sess_hdl, dev_tgt)
+        client.ingress_int_endpoint_int_sink_update_outer_set_default_action_ingress_int_endpoint_nop(sess_hdl, dev_tgt)
+        client.egress_int_insertion_int_insert_set_default_action_egress_int_insertion_int_reset(sess_hdl, dev_tgt)
         # following table are not applied to non-int packet.. but set the
         # default actions for future
-        client.int_source_set_default_action_int_set_no_src(sess_hdl, dev_tgt)
-        client.int_meta_header_update_set_default_action_int_update_total_hop_cnt(sess_hdl,
+        client.ingress_int_endpoint_int_source_set_default_action_ingress_int_endpoint_int_set_no_src(sess_hdl, dev_tgt)
+        client.egress_int_insertion_int_meta_header_update_set_default_action_egress_int_insertion_int_update_total_hop_cnt(sess_hdl,
                                                                                   dev_tgt)
-        client.int_outer_encap_set_default_action_nop(sess_hdl, dev_tgt)
+        client.egress_int_outer_encap_int_outer_encap_set_default_action_egress_int_outer_encap_nop(sess_hdl, dev_tgt)
 
     if nat_enabled:
-        client.nat_twice_set_default_action_on_miss(sess_hdl, dev_tgt)
-        client.nat_dst_set_default_action_on_miss(sess_hdl, dev_tgt)
-        client.nat_src_set_default_action_on_miss(sess_hdl, dev_tgt)
-        client.nat_flow_set_default_action_nop(sess_hdl, dev_tgt)
+        client.ingress_ingress_nat_nat_twice_set_default_action_ingress_ingress_nat_on_miss(sess_hdl, dev_tgt)
+        client.ingress_ingress_nat_nat_dst_set_default_action_ingress_ingress_nat_on_miss(sess_hdl, dev_tgt)
+        client.ingress_ingress_nat_nat_src_set_default_action_ingress_ingress_nat_on_miss(sess_hdl, dev_tgt)
+        client.ingress_ingress_nat_nat_flow_set_default_action_ingress_ingress_nat_nop(sess_hdl, dev_tgt)
 
     if egress_acl_enabled:
-        client.egress_mac_acl_set_default_action_nop(sess_hdl, dev_tgt)
-        client.egress_ip_acl_set_default_action_nop(sess_hdl, dev_tgt)
-        client.egress_ipv6_acl_set_default_action_nop(sess_hdl, dev_tgt)
-        client.ingress_l4_src_port_set_default_action_nop(sess_hdl, dev_tgt)
-        client.ingress_l4_dst_port_set_default_action_nop(sess_hdl, dev_tgt)
-        client.egress_l4_src_port_set_default_action_nop(sess_hdl, dev_tgt)
-        client.egress_l4_dst_port_set_default_action_nop(sess_hdl, dev_tgt)
-        client.egress_l4port_fields_set_default_action_nop(sess_hdl, dev_tgt)
+        client.egress_egress_acl_egress_mac_acl_set_default_action_egress_egress_acl_nop(sess_hdl, dev_tgt)
+        client.egress_egress_acl_egress_ip_acl_set_default_action_egress_egress_acl_nop(sess_hdl, dev_tgt)
+        client.egress_egress_acl_egress_ipv6_acl_set_default_action_egress_egress_acl_nop(sess_hdl, dev_tgt)
+        client.ingress_ingress_l4port_ingress_l4_src_port_set_default_action_ingress_ingress_l4port_nop(sess_hdl, dev_tgt)
+        client.ingress_ingress_l4port_ingress_l4_dst_port_set_default_action_ingress_ingress_l4port_nop(sess_hdl, dev_tgt)
+        client.egress_egress_l4port_egress_l4_src_port_set_default_action_egress_egress_l4port_nop(sess_hdl, dev_tgt)
+        client.egress_egress_l4port_egress_l4_dst_port_set_default_action_egress_egress_l4port_nop(sess_hdl, dev_tgt)
+        client.egress_egress_l4port_egress_l4_dst_port_set_default_action_egress_egress_l4port_nop(sess_hdl, dev_tgt)
 
 def delete_default_entries(client, sess_hdl, dev_id):
     return
@@ -372,7 +381,7 @@ def populate_init_fabric_entries(client, sess_hdl, dev_tgt, inner_rmac_group,
         l3_metadata_fib_hit_mask=1,
         nat_metadata_nat_hit=0,
         nat_metadata_nat_hit_mask=0,
-        l2_metadata_lkp_pkt_type=0,
+        userMetadata_l2_metadata_lkp_pkt_type=0,
         l2_metadata_lkp_pkt_type_mask=0,
         l3_metadata_lkp_ip_type=0,
         l3_metadata_lkp_ip_type_mask=0,
@@ -404,8 +413,8 @@ def populate_init_fabric_entries(client, sess_hdl, dev_tgt, inner_rmac_group,
         l3_metadata_fib_hit_mask=0,
         nat_metadata_nat_hit=0,
         nat_metadata_nat_hit_mask=0,
-        l2_metadata_lkp_pkt_type=0,
-        l2_metadata_lkp_pkt_type_mask=0,
+        userMetadata_l2_metadata_lkp_pkt_type=0,
+        userMetadata_l2_metadata_lkp_pkt_type_mask=0,
         l3_metadata_lkp_ip_type=0,
         l3_metadata_lkp_ip_type_mask=0,
         multicast_metadata_igmp_snooping_enabled=0,
@@ -426,14 +435,14 @@ def populate_init_fabric_entries(client, sess_hdl, dev_tgt, inner_rmac_group,
     # add default inner rmac entry
     match_spec = dc_rmac_match_spec_t(
         l3_metadata_rmac_group=inner_rmac_group,
-        l2_metadata_lkp_mac_da=macAddr_to_string(rmac))
+        userMetadata_l2_metadata_lkp_mac_da=macAddr_to_string(rmac))
     client.rmac_table_add_with_rmac_hit(sess_hdl, dev_tgt, match_spec)
 
     if tunnel_enabled:
         # add default outer rmac entry
         match_spec = dc_outer_rmac_match_spec_t(
             l3_metadata_rmac_group=outer_rmac_group,
-            l2_metadata_lkp_mac_da=macAddr_to_string(rmac))
+            userMetadata_l2_metadata_lkp_mac_da=macAddr_to_string(rmac))
         client.outer_rmac_table_add_with_outer_rmac_hit(
             sess_hdl, dev_tgt, match_spec)
 
@@ -470,114 +479,114 @@ def populate_init_fabric_entries(client, sess_hdl, dev_tgt, inner_rmac_group,
         sess_hdl, dev_tgt, match_spec, action_spec)
 
     # initalize l3 rewrite table
-    match_spec = dc_l3_rewrite_match_spec_t(
+    match_spec = dc_egress_mac_rewrite_l3_rewrite_match_spec_t(
         ipv4_valid=1,
         ipv4_dstAddr=0,
         ipv4_dstAddr_mask=0)
-    client.l3_rewrite_table_add_with_ipv4_unicast_rewrite(
+    client.egress_mac_rewrite_l3_rewrite_table_add_with_egress_mac_rewrite_ipv4_unicast_rewrite(
         sess_hdl, dev_tgt, match_spec, 100)
 
 def populate_init_entries(client, sess_hdl, dev_tgt, rewrite_index, rmac,
     inner_rmac_group, outer_rmac_group, ipv6_enabled, tunnel_enabled):
     ret = []
-    match_spec = dc_smac_rewrite_match_spec_t(
-                            egress_metadata_smac_idx=rewrite_index)
-    action_spec = dc_rewrite_smac_action_spec_t(
+    match_spec = dc_egress_mac_rewrite_smac_rewrite_match_spec_t(
+                            userMetadata_egress_metadata_smac_idx=rewrite_index)
+    action_spec = dc_egress_mac_rewrite_rewrite_smac_action_spec_t(
                             action_smac=macAddr_to_string(rmac))
-    ret.append(client.smac_rewrite_table_add_with_rewrite_smac(
+    ret.append(client.egress_mac_rewrite_smac_rewrite_table_add_with_egress_mac_rewrite_rewrite_smac(
                             sess_hdl, dev_tgt,
                             match_spec, action_spec))
 
-    match_spec = dc_fwd_result_match_spec_t(
-                            l2_metadata_l2_redirect=0,
-                            l2_metadata_l2_redirect_mask=0,
-                            acl_metadata_acl_redirect=0,
-                            acl_metadata_acl_redirect_mask=0,
-                            acl_metadata_racl_redirect=0,
-                            acl_metadata_racl_redirect_mask=0,
-                            l3_metadata_fib_hit=1,
-                            l3_metadata_fib_hit_mask=1,
-                            l3_metadata_rmac_hit=0,
-                            l3_metadata_rmac_hit_mask=0,
-                            nat_metadata_nat_hit=0,
-                            nat_metadata_nat_hit_mask=0,
-                            l2_metadata_lkp_pkt_type=0,
-                            l2_metadata_lkp_pkt_type_mask=0,
-                            l3_metadata_lkp_ip_type=0,
-                            l3_metadata_lkp_ip_type_mask=0,
-                            multicast_metadata_igmp_snooping_enabled=0,
-                            multicast_metadata_igmp_snooping_enabled_mask=0,
-                            multicast_metadata_mld_snooping_enabled=0,
-                            multicast_metadata_mld_snooping_enabled_mask=0,
-                            multicast_metadata_mcast_route_hit=0,
-                            multicast_metadata_mcast_route_hit_mask=0,
-                            multicast_metadata_mcast_bridge_hit=0,
-                            multicast_metadata_mcast_bridge_hit_mask=0,
-                            multicast_metadata_mcast_rpf_group=0,
-                            multicast_metadata_mcast_rpf_group_mask=0,
-                            multicast_metadata_mcast_mode=0,
-                            multicast_metadata_mcast_mode_mask=0)
-    ret.append(client.fwd_result_table_add_with_set_fib_redirect_action(
+    match_spec = dc_ingress_fwd_results_fwd_result_match_spec_t(
+                            userMetadata_l2_metadata_l2_redirect=0,
+                            userMetadata_l2_metadata_l2_redirect_mask=0,
+                            userMetadata_acl_metadata_acl_redirect=0,
+                            userMetadata_acl_metadata_acl_redirect_mask=0,
+                            userMetadata_acl_metadata_racl_redirect=0,
+                            userMetadata_acl_metadata_racl_redirect_mask=0,
+                            userMetadata_l3_metadata_fib_hit=1,
+                            userMetadata_l3_metadata_fib_hit_mask=1,
+                            userMetadata_l3_metadata_rmac_hit=0,
+                            userMetadata_l3_metadata_rmac_hit_mask=0,
+                            userMetadata_nat_metadata_nat_hit=0,
+                            userMetadata_nat_metadata_nat_hit_mask=0,
+                            userMetadata_l2_metadata_lkp_pkt_type=0,
+                            userMetadata_l2_metadata_lkp_pkt_type_mask=0,
+                            userMetadata_l3_metadata_lkp_ip_type=0,
+                            userMetadata_l3_metadata_lkp_ip_type_mask=0,
+                            userMetadata_multicast_metadata_igmp_snooping_enabled=0,
+                            userMetadata_multicast_metadata_igmp_snooping_enabled_mask=0,
+                            userMetadata_multicast_metadata_mld_snooping_enabled=0,
+                            userMetadata_multicast_metadata_mld_snooping_enabled_mask=0,
+                            userMetadata_multicast_metadata_mcast_route_hit=0,
+                            userMetadata_multicast_metadata_mcast_route_hit_mask=0,
+                            userMetadata_multicast_metadata_mcast_bridge_hit=0,
+                            userMetadata_multicast_metadata_mcast_bridge_hit_mask=0,
+                            userMetadata_multicast_metadata_mcast_rpf_group=0,
+                            userMetadata_multicast_metadata_mcast_rpf_group_mask=0,
+                            userMetadata_multicast_metadata_mcast_mode=0,
+                            userMetadata_multicast_metadata_mcast_mode_mask=0)
+    ret.append(client.ingress_fwd_results_fwd_result_table_add_with_ingress_fwd_results_set_fib_redirect_action(
                             sess_hdl, dev_tgt,
                             match_spec, 1000))
 
-    match_spec = dc_fwd_result_match_spec_t(
-                            l2_metadata_l2_redirect=1,
-                            l2_metadata_l2_redirect_mask=1,
-                            acl_metadata_acl_redirect=0,
-                            acl_metadata_acl_redirect_mask=0,
-                            acl_metadata_racl_redirect=0,
-                            acl_metadata_racl_redirect_mask=0,
-                            l3_metadata_fib_hit=0,
-                            l3_metadata_fib_hit_mask=0,
-                            l3_metadata_rmac_hit=0,
-                            l3_metadata_rmac_hit_mask=0,
-                            nat_metadata_nat_hit=0,
-                            nat_metadata_nat_hit_mask=0,
-                            l2_metadata_lkp_pkt_type=0,
-                            l2_metadata_lkp_pkt_type_mask=0,
-                            l3_metadata_lkp_ip_type=0,
-                            l3_metadata_lkp_ip_type_mask=0,
-                            multicast_metadata_igmp_snooping_enabled=0,
-                            multicast_metadata_igmp_snooping_enabled_mask=0,
-                            multicast_metadata_mld_snooping_enabled=0,
-                            multicast_metadata_mld_snooping_enabled_mask=0,
-                            multicast_metadata_mcast_route_hit=0,
-                            multicast_metadata_mcast_route_hit_mask=0,
-                            multicast_metadata_mcast_bridge_hit=0,
-                            multicast_metadata_mcast_bridge_hit_mask=0,
-                            multicast_metadata_mcast_rpf_group=0,
-                            multicast_metadata_mcast_rpf_group_mask=0,
-                            multicast_metadata_mcast_mode=0,
-                            multicast_metadata_mcast_mode_mask=0)
-    ret.append(client.fwd_result_table_add_with_set_l2_redirect_action(
+    match_spec = dc_ingress_fwd_results_fwd_result_match_spec_t(
+                            userMetadata_l2_metadata_l2_redirect=1,
+                            userMetadata_l2_metadata_l2_redirect_mask=1,
+                            userMetadata_acl_metadata_acl_redirect=0,
+                            userMetadata_acl_metadata_acl_redirect_mask=0,
+                            userMetadata_acl_metadata_racl_redirect=0,
+                            userMetadata_acl_metadata_racl_redirect_mask=0,
+                            userMetadata_l3_metadata_fib_hit=0,
+                            userMetadata_l3_metadata_fib_hit_mask=0,
+                            userMetadata_l3_metadata_rmac_hit=0,
+                            userMetadata_l3_metadata_rmac_hit_mask=0,
+                            userMetadata_nat_metadata_nat_hit=0,
+                            userMetadata_nat_metadata_nat_hit_mask=0,
+                            userMetadata_l2_metadata_lkp_pkt_type=0,
+                            userMetadata_l2_metadata_lkp_pkt_type_mask=0,
+                            userMetadata_l3_metadata_lkp_ip_type=0,
+                            userMetadata_l3_metadata_lkp_ip_type_mask=0,
+                            userMetadata_multicast_metadata_igmp_snooping_enabled=0,
+                            userMetadata_multicast_metadata_igmp_snooping_enabled_mask=0,
+                            userMetadata_multicast_metadata_mld_snooping_enabled=0,
+                            userMetadata_multicast_metadata_mld_snooping_enabled_mask=0,
+                            userMetadata_multicast_metadata_mcast_route_hit=0,
+                            userMetadata_multicast_metadata_mcast_route_hit_mask=0,
+                            userMetadata_multicast_metadata_mcast_bridge_hit=0,
+                            userMetadata_multicast_metadata_mcast_bridge_hit_mask=0,
+                            userMetadata_multicast_metadata_mcast_rpf_group=0,
+                            userMetadata_multicast_metadata_mcast_rpf_group_mask=0,
+                            userMetadata_multicast_metadata_mcast_mode=0,
+                            userMetadata_multicast_metadata_mcast_mode_mask=0)
+    ret.append(client.ingress_fwd_results_fwd_result_table_add_with_ingress_fwd_results_set_l2_redirect_action(
                             sess_hdl, dev_tgt,
                             match_spec, 1000))
 
     #Add default inner rmac entry
-    match_spec = dc_rmac_match_spec_t(
-                           l3_metadata_rmac_group=inner_rmac_group,
-                           l2_metadata_lkp_mac_da=macAddr_to_string(rmac))
-    ret.append(client.rmac_table_add_with_rmac_hit(
+    match_spec = dc_ingress_rmac_match_spec_t(
+                           userMetadata_l3_metadata_rmac_group=inner_rmac_group,
+                           userMetadata_l2_metadata_lkp_mac_da=macAddr_to_string(rmac))
+    ret.append(client.ingress_rmac_table_add_with_ingress_rmac_hit(
                            sess_hdl, dev_tgt,
                            match_spec))
 
     #Initialize vlan decap table
-    match_spec = dc_vlan_decap_match_spec_t(
+    match_spec = dc_egress_vlan_decap_vlan_decap_match_spec_t(
                             vlan_tag__0__valid=1,
                             vlan_tag__1__valid=0)
-    ret.append(client.vlan_decap_table_add_with_remove_vlan_single_tagged(
+    ret.append(client.egress_vlan_decap_vlan_decap_table_add_with_egress_vlan_decap_remove_vlan_single_tagged(
                            sess_hdl, dev_tgt,
                            match_spec))
-    match_spec = dc_vlan_decap_match_spec_t(
+    match_spec = dc_egress_vlan_decap_vlan_decap_match_spec_t(
                             vlan_tag__0__valid=1,
                             vlan_tag__1__valid=1)
-    ret.append(client.vlan_decap_table_add_with_remove_vlan_double_tagged(
+    ret.append(client.egress_vlan_decap_vlan_decap_table_add_with_egress_vlan_decap_remove_vlan_double_tagged(
                            sess_hdl, dev_tgt,
                            match_spec))
 
-    #Initialize L3 rewrite table
-    match_spec = dc_l3_rewrite_match_spec_t(
+   #Initialize L3 rewrite table
+    match_spec = dc_egress_mac_rewrite_l3_rewrite_match_spec_t(
                             ipv4_valid=1,
                             ipv6_valid=0,
                             mpls_0__valid=0,
@@ -585,9 +594,9 @@ def populate_init_entries(client, sess_hdl, dev_tgt, rewrite_index, rmac,
                             ipv4_dstAddr_mask=0,
                             ipv6_dstAddr=ipv6Addr_to_string('::'),
                             ipv6_dstAddr_mask=ipv6Addr_to_string('::'))
-    ret.append(client.l3_rewrite_table_add_with_ipv4_unicast_rewrite(
+    ret.append(client.egress_mac_rewrite_l3_rewrite_table_add_with_egress_mac_rewrite_ipv4_unicast_rewrite(
                             sess_hdl, dev_tgt, match_spec, 100))
-    match_spec = dc_l3_rewrite_match_spec_t(
+    match_spec = dc_egress_mac_rewrite_l3_rewrite_match_spec_t(
                             ipv4_valid=0,
                             ipv6_valid=1,
                             mpls_0__valid=0,
@@ -595,31 +604,32 @@ def populate_init_entries(client, sess_hdl, dev_tgt, rewrite_index, rmac,
                             ipv4_dstAddr_mask=0,
                             ipv6_dstAddr=ipv6Addr_to_string('::'),
                             ipv6_dstAddr_mask=ipv6Addr_to_string('::'))
+
     if ipv6_enabled:
-        ret.append(client.l3_rewrite_table_add_with_ipv6_unicast_rewrite(
+        ret.append(client.egress_mac_rewrite_l3_rewrite_table_add_with_egress_mac_rewrite_ipv6_unicast_rewrite(
                             sess_hdl, dev_tgt, match_spec, 200))
 
     if tunnel_enabled:
         #Add default outer rmac entry
-        match_spec = dc_outer_rmac_match_spec_t(
-                            l3_metadata_rmac_group=outer_rmac_group,
+        match_spec = dc_ingress_tunnel_outer_rmac_match_spec_t(
+                            userMetadata_l3_metadata_rmac_group=outer_rmac_group,
                             ethernet_dstAddr=macAddr_to_string(rmac))
-        ret.append(client.outer_rmac_table_add_with_outer_rmac_hit(
+        ret.append(client.ingress_tunnel_outer_rmac_table_add_with_ingress_tunnel_outer_rmac_hit(
                             sess_hdl, dev_tgt,
                             match_spec))
     return ret
 
 def delete_init_entries(client, sess_hdl, dev, ret_list, tunnel_enabled):
-    client.smac_rewrite_table_delete(sess_hdl, dev, ret_list[0])
-    client.fwd_result_table_delete(sess_hdl, dev, ret_list[1])
-    client.fwd_result_table_delete(sess_hdl, dev, ret_list[2])
-    client.rmac_table_delete(sess_hdl, dev, ret_list[3])
-    client.vlan_decap_table_delete(sess_hdl, dev, ret_list[4])
-    client.vlan_decap_table_delete(sess_hdl, dev, ret_list[5])
-    client.l3_rewrite_table_delete(sess_hdl, dev, ret_list[6])
-    client.l3_rewrite_table_delete(sess_hdl, dev, ret_list[7])
+    client.egress_mac_rewrite_smac_rewrite_table_delete(sess_hdl, dev, ret_list[0])
+    client.ingress_fwd_results_fwd_result_table_delete(sess_hdl, dev, ret_list[1])
+    client.ingress_fwd_results_fwd_result_table_delete(sess_hdl, dev, ret_list[2])
+    client.ingress_rmac_table_delete(sess_hdl, dev, ret_list[3])
+    client.egress_vlan_decap_vlan_decap_table_delete(sess_hdl, dev, ret_list[4])
+    client.egress_vlan_decap_vlan_decap_table_delete(sess_hdl, dev, ret_list[5])
+    client.egress_mac_rewrite_l3_rewrite_table_delete(sess_hdl, dev, ret_list[6])
+    client.egress_mac_rewrite_l3_rewrite_table_delete(sess_hdl, dev, ret_list[7])
     if tunnel_enabled:
-        client.outer_rmac_table_delete(sess_hdl, dev, ret_list[8])
+        client.ingress_tunnel_outer_rmac_table_delete(sess_hdl, dev, ret_list[8])
 
 def add_fabric_lag(client, sess_hdl, dev_tgt, src_device, port_list):
     grp_hdl = client.fabric_lag_action_profile_create_group(
@@ -643,16 +653,17 @@ def program_ports(client, sess_hdl, dev_tgt, port_count):
     count = 1
     ret = []
     while (count <= port_count):
+        print("*****************************count = " + str(count))
         match_spec = \
-            dc_ingress_port_mapping_match_spec_t(
+            dc_ingress_ingress_port_mapping_ingress_port_mapping_match_spec_t(
                 standard_metadata_ingress_port=count)
-        action_spec = dc_set_ifindex_action_spec_t(
+        action_spec = dc_ingress_ingress_port_mapping_set_ifindex_action_spec_t(
                             action_ifindex=count,
                             action_port_type=0)
-        port_hdl = client.ingress_port_mapping_table_add_with_set_ifindex(
+        port_hdl = client.ingress_ingress_port_mapping_ingress_port_mapping_table_add_with_ingress_ingress_port_mapping_set_ifindex(
                              sess_hdl, dev_tgt,
                              match_spec, action_spec)
-        action_spec = dc_set_ingress_port_properties_action_spec_t(
+        action_spec = dc_ingress_ingress_port_mapping_set_ingress_port_properties_action_spec_t(
                              action_if_label=count,
                              action_qos_group=0,
                              action_tc_qos_group=0,
@@ -660,27 +671,53 @@ def program_ports(client, sess_hdl, dev_tgt, port_count):
                              action_color=0,
                              action_trust_dscp=0,
                              action_trust_pcp=0)
-        port2_hdl = client.ingress_port_properties_table_add_with_set_ingress_port_properties(
+        port2_hdl = client.ingress_ingress_port_mapping_ingress_port_properties_table_add_with_ingress_ingress_port_mapping_set_ingress_port_properties(
                              sess_hdl, dev_tgt, match_spec, action_spec)
 
-        action_spec = dc_set_lag_port_action_spec_t(
+        # ##################################################################################
+        action_spec = dc_ingress_lag_set_lag_port_action_spec_t(
                               action_port=count)
-        mbr_hdl = client.lag_action_profile_add_member_with_set_lag_port(
+        mbr_hdl = client.action_profile_1_add_member_with_ingress_lag_set_lag_port(
                              sess_hdl, dev_tgt,
                              action_spec)
 
-        match_spec = dc_lag_group_match_spec_t(
-                             ingress_metadata_egress_ifindex=count)
-        lag_hdl = client.lag_group_add_entry(
+        match_spec = dc_ingress_lag_lag_group_match_spec_t(
+                             userMetadata_ingress_metadata_egress_ifindex=count)
+        lag_hdl = client.ingress_lag_lag_group_add_entry(
                              sess_hdl, dev_tgt,
                              match_spec, mbr_hdl)
-        match_spec = dc_egress_port_mapping_match_spec_t(
+
+        # ##################################################################################
+        # match_spec = dc_ingress_lag_lag_group_match_spec_t(
+        #                      userMetadata_ingress_metadata_egress_ifindex=count)
+
+        # action_spec = dc_ingress_lag_set_lag_remote_port_action_spec_t(
+        #                         action_device = dev_tgt,
+        #                         action_port = count)
+        # mbr_hdl = action_profile_1_add_member_with_ingress_lag_set_lag_remote_port(
+        #                         sess_hdl, dev_tgt,
+        #                         action_spec)
+        # lag_hdl = client.ingress_lag_lag_group_add_entry(
+        #                      sess_hdl, dev_tgt,
+        #                      match_spec, mbr_hdl)
+        # action_spec = dc_ingress_lag_set_lag_port_action_spec_t(
+        #                       action_port=count)
+        # mbr_hdl = client.action_profile_1_add_member_with_ingress_lag_set_lag_port(
+        #                      sess_hdl, dev_tgt,
+        #                      action_spec)
+        # lag_hdl = client.ingress_lag_lag_group_add_entry(
+        #                      sess_hdl, dev_tgt,
+        #                      match_spec, mbr_hdl)
+
+        # ##################################################################################
+
+        match_spec = dc_egress_egress_port_mapping_match_spec_t(
                              standard_metadata_egress_port=count)
-        action_spec = dc_egress_port_type_normal_action_spec_t(
+        action_spec = dc_egress_egress_port_type_normal_action_spec_t(
                              action_ifindex=count,
                              action_qos_group=0,
                              action_if_label=0)
-        egress_hdl = client.egress_port_mapping_table_add_with_egress_port_type_normal(
+        egress_hdl = client.egress_egress_port_mapping_table_add_with_egress_egress_port_type_normal(
                              sess_hdl,
                              dev_tgt,
                              match_spec,
@@ -715,24 +752,24 @@ def program_emulation_ports(client, sess_hdl, dev_tgt, port_count):
         port2_hdl = client.ingress_port_properties_table_add_with_set_ingress_port_properties(
                              sess_hdl, dev_tgt, match_spec, action_spec)
 
-        action_spec = dc_set_lag_port_action_spec_t(
+        action_spec = dc_ingress_lag_set_lag_port_action_spec_t(
                               action_port=count)
-        mbr_hdl = client.lag_action_profile_add_member_with_set_lag_port(
+        mbr_hdl = client.action_profile_2_add_member_with_ingress_lag_set_lag_port(
                              sess_hdl, dev_tgt,
                              action_spec)
 
-        match_spec = dc_lag_group_match_spec_t(
-                             ingress_metadata_egress_ifindex=count+1)
-        lag_hdl = client.lag_group_add_entry(
+        match_spec = dc_ingress_lag_lag_group_match_spec_t(
+                             userMetadata_ingress_metadata_egress_ifindex=count+1)
+        lag_hdl = client.ingress_lag_lag_group_add_entry(
                               sess_hdl, dev_tgt,
                               match_spec, mbr_hdl)
-        match_spec = dc_egress_port_mapping_match_spec_t(
+        match_spec = dc_egress_egress_port_mapping_match_spec_t(
                              eg_intr_md_egress_port=count)
-        action_spec = dc_egress_port_type_normal_action_spec_t(
+        action_spec = dc_egress_egress_port_type_normal_action_spec_t(
                              action_ifindex=count,
                              action_qos_group=0,
                              action_if_label=0)
-        egress_hdl = client.egress_port_mapping_table_add_with_egress_port_type_normal(
+        egress_hdl = client.egress_egress_port_mapping_table_add_with_egress_egress_port_type_normal(
                              sess_hdl,
                              dev_tgt,
                              match_spec,
@@ -756,20 +793,20 @@ def add_ports(client, sess_hdl, dev_tgt, port_list, port_type, l2xid):
         client.ingress_port_mapping_table_add_with_set_ifindex(
             sess_hdl, dev_tgt, match_spec, action_spec)
 
-        action_spec = dc_set_lag_port_action_spec_t(action_port=i)
-        mbr_hdl = client.lag_action_profile_add_member_with_set_lag_port(
+        action_spec = dc_ingress_lag_set_lag_port_action_spec_t(action_port=i)
+        mbr_hdl = client.action_profile_2_add_member_with_ingress_lag_set_lag_port(
             sess_hdl, dev_tgt, action_spec)
-        match_spec = dc_lag_group_match_spec_t(
-            ingress_metadata_egress_ifindex=ifindex)
-        client.lag_group_add_entry(sess_hdl, dev_tgt, match_spec, mbr_hdl)
+        match_spec = dc_ingress_lag_lag_group_match_spec_t(
+            userMetadata_ingress_metadata_egress_ifindex=ifindex)
+        client.ingress_lag_lag_group_add_entry(sess_hdl, dev_tgt, match_spec, mbr_hdl)
 
-        match_spec = dc_egress_port_mapping_match_spec_t(
+        match_spec = dc_egress_egress_port_mapping_match_spec_t(
            standard_metadata_egress_port=i)
         if port_type == PortType.Normal:
-            action_spec = dc_egress_port_type_normal_action_spec_t(
+            action_spec = dc_egress_egress_port_type_normal_action_spec_t(
                              action_ifindex=count,
                              action_qos_group=0)
-            client.egress_port_mapping_table_add_with_egress_port_type_normal(
+            client.egress_egress_port_mapping_table_add_with_egress_egress_port_type_normal(
                 sess_hdl, dev_tgt, match_spec, action_spec)
         elif port_type == PortType.Fabric:
             action_spec = dc_egress_port_type_fabric_action_spec_t(action_ifindex=ifindex)
@@ -780,41 +817,43 @@ def add_ports(client, sess_hdl, dev_tgt, port_list, port_type, l2xid):
 def delete_ports(client, sess_hdl, dev, port_count, ret_list):
     count = 0
     while (count < port_count):
-        client.lag_group_table_delete(
+        client.ingress_lag_lag_group_table_delete(
                               sess_hdl, dev,
                              ret_list[count]['lag'])
-        client.lag_action_profile_del_member(
-                             sess_hdl, dev,
-                             ret_list[count]['mbr'])
-        client.ingress_port_mapping_table_delete(
+        # client.ingress_fabric_lag_act_selector_del_member(
+        #                      sess_hdl, dev,
+        #                      ret_list[count]['mbr'])
+        # client.ingress_port_vlan_mapping_port_vlan_mapping_table_delete(
+        #                      sess_hdl, dev, ret_list[count]['port'])
+        client.ingress_ingress_port_mapping_ingress_port_mapping_table_delete(
                              sess_hdl, dev, ret_list[count]['port'])
-        client.ingress_port_properties_table_delete(
+        client.ingress_ingress_port_mapping_ingress_port_properties_table_delete(
                              sess_hdl, dev, ret_list[count]['port2'])
-        client.egress_port_mapping_table_delete(
+        client.egress_egress_port_mapping_table_delete(
                              sess_hdl, dev, ret_list[count]['egress'])
 
         count = count + 1
 
 def program_bd(client, sess_hdl, dev_tgt, vlan, mc_index):
-    match_spec = dc_bd_flood_match_spec_t(
-                            ingress_metadata_bd=vlan,
-                            l2_metadata_lkp_pkt_type=0x1)
-    action_spec = dc_set_bd_flood_mc_index_action_spec_t(
+    match_spec = dc_ingress_multicast_flooding_bd_flood_match_spec_t(
+                            userMetadata_ingress_metadata_bd=vlan,
+                            userMetadata_l2_metadata_lkp_pkt_type=0x1)
+    action_spec = dc_ingress_multicast_flooding_set_bd_flood_mc_index_action_spec_t(
                             action_mc_index=mc_index)
-    hdl = client.bd_flood_table_add_with_set_bd_flood_mc_index(
+    hdl = client.ingress_multicast_flooding_bd_flood_table_add_with_ingress_multicast_flooding_set_bd_flood_mc_index(
                             sess_hdl, dev_tgt,
                             match_spec, action_spec)
     return hdl
 
 
 def delete_bd(client, sess_hdl, dev, hdl):
-    client.bd_flood_table_delete(sess_hdl, dev, hdl)
+    client.ingress_multicast_flooding_bd_flood_table_delete(sess_hdl, dev, hdl)
     return 0
 
 def program_vlan(client, sess_hdl, dev_tgt, vrf, inner_rmac_group,
                  vlan, ifindex,
                  v4_enabled, v6_enabled, uuc_mc_index):
-    action_spec = dc_set_bd_properties_action_spec_t(
+    action_spec = dc_ingress_port_vlan_mapping_set_bd_properties_action_spec_t(
         action_bd=vlan,
         action_vrf=vrf,
         action_rmac_group=inner_rmac_group,
@@ -835,24 +874,24 @@ def program_vlan(client, sess_hdl, dev_tgt, vrf, inner_rmac_group,
         action_ipv6_mcast_key=0,
         action_stats_idx=0,
         action_learning_enabled=0)
-    mbr_hdl = client.bd_action_profile_add_member_with_set_bd_properties(
+    mbr_hdl = client.action_profile_0_add_member_with_ingress_port_vlan_mapping_set_bd_properties(
         sess_hdl, dev_tgt, action_spec)
 
-    match_spec = dc_bd_flood_match_spec_t(ingress_metadata_bd=vlan,
-                                          l2_metadata_lkp_pkt_type=0x1)
-    action_spec = dc_set_bd_flood_mc_index_action_spec_t(
+    match_spec = dc_ingress_multicast_flooding_bd_flood_match_spec_t(userMetadata_ingress_metadata_bd=vlan,
+                                          userMetadata_l2_metadata_lkp_pkt_type=0x1)
+    action_spec = dc_ingress_multicast_flooding_set_bd_flood_mc_index_action_spec_t(
         action_mc_index=uuc_mc_index)
-    client.bd_flood_table_add_with_set_bd_flood_mc_index(sess_hdl, dev_tgt,
+    client.ingress_multicast_flooding_bd_flood_table_add_with_ingress_multicast_flooding_set_bd_flood_mc_index(sess_hdl, dev_tgt,
                                                          match_spec,
                                                          action_spec)
 
-    match_spec = dc_port_vlan_mapping_match_spec_t(
-        ingress_metadata_ifindex=ifindex,
+    match_spec = dc_ingress_port_vlan_mapping_port_vlan_mapping_match_spec_t(
+        userMetadata_ingress_metadata_ifindex=ifindex,
         vlan_tag__0__valid=0,
-        vlan_tag__0__vid=0,
+        scalars_key_6=0,
         vlan_tag__1__valid=0,
-        vlan_tag__1__vid=0)
-    hdl = client.port_vlan_mapping_add_entry(sess_hdl, dev_tgt, match_spec,
+        scalars_key_7=0)
+    hdl = client.ingress_port_vlan_mapping_port_vlan_mapping_add_entry(sess_hdl, dev_tgt, match_spec,
                                              mbr_hdl)
 
     return hdl, mbr_hdl
@@ -868,7 +907,7 @@ def program_egress_bd_map(client, sess_hdl, dev_tgt, smac_index, vlan):
 def program_vlan_mapping(client, sess_hdl, dev_tgt, vrf, vlan, port,
                          v4_enabled, v6_enabled, rmac, learning_enabled,
                          ctag=None, stag=None, rid=0):
-    action_spec = dc_set_bd_properties_action_spec_t(
+    action_spec = dc_ingress_port_vlan_mapping_set_bd_properties_action_spec_t(
                             action_bd=vlan,
                             action_vrf=vrf,
                             action_rmac_group=rmac,
@@ -889,7 +928,7 @@ def program_vlan_mapping(client, sess_hdl, dev_tgt, vrf, vlan, port,
                             action_ipv6_mcast_key=0,
                             action_stats_idx=0,
                             action_learning_enabled=learning_enabled)
-    mbr_hdl = client.bd_action_profile_add_member_with_set_bd_properties(
+    mbr_hdl = client.ingress_port_vlan_mapping_ap_add_member_with_ingress_port_vlan_mapping_set_bd_properties(
                             sess_hdl, dev_tgt,
                             action_spec)
     vlan_id = [0, 0]
@@ -904,34 +943,40 @@ def program_vlan_mapping(client, sess_hdl, dev_tgt, vrf, vlan, port,
         vlan_id[idx] = ctag
         vlan_valid[idx] = 1
 
-    match_spec = dc_port_vlan_mapping_match_spec_t(
-                            ingress_metadata_ifindex=port,
+    match_spec = dc_ingress_port_vlan_mapping_port_vlan_mapping_match_spec_t(
+                            userMetadata_ingress_metadata_ifindex=port,
                             vlan_tag__0__valid=vlan_valid[0],
-                            vlan_tag__0__vid=vlan_id[0],
+                            scalars_key_6=vlan_id[0],
                             vlan_tag__1__valid=vlan_valid[1],
-                            vlan_tag__1__vid=vlan_id[1])
-    hdl = client.port_vlan_mapping_add_entry(
+                            scalars_key_7=vlan_id[1])
+    hdl = client.ingress_port_vlan_mapping_port_vlan_mapping_add_entry(
                             sess_hdl, dev_tgt,
                             match_spec, mbr_hdl)
     return hdl, mbr_hdl
 
 def delete_vlan_mapping(client, sess_hdl, dev, hdl, mbr_hdl):
-    client.port_vlan_mapping_table_delete(
+    client.ingress_port_vlan_mapping_port_vlan_mapping_table_delete(
                             sess_hdl, dev,
                             hdl)
-    client.bd_action_profile_del_member(
-                            sess_hdl, dev,
-                            mbr_hdl)
+    # client.action_profile_0_del_member(
+    #                         sess_hdl, dev,
+    #                         mbr_hdl)
+    # client.action_profile_1_del_member(
+    #                         sess_hdl, dev,
+    #                         mbr_hdl)
+    # client.ingress_port_vlan_mapping_ap_del_member(
+    #                         sess_hdl, dev,
+    #                         mbr_hdl)
 
 
 def program_tunnel_ethernet_vlan(client, sess_hdl, dev_tgt, vrf, vlan, port, vni,
                                  ttype, v4_enabled, inner_rmac):
-    match_spec = dc_tunnel_match_spec_t(
-                             tunnel_metadata_tunnel_vni=vni,
-                             tunnel_metadata_ingress_tunnel_type=ttype,
+    match_spec = dc_ingress_tunnel_tunnel_match_spec_t(
+                             userMetadata_tunnel_metadata_tunnel_vni=vni,
+                             userMetadata_tunnel_metadata_ingress_tunnel_type=ttype,
                              inner_ipv4_valid=1,
                              inner_ipv6_valid=0)
-    action_spec = dc_terminate_tunnel_inner_ethernet_ipv4_action_spec_t(
+    action_spec = dc_ingress_tunnel_terminate_tunnel_inner_ethernet_ipv4_action_spec_t(
                             action_bd=vlan,
                             action_vrf=vrf,
                             action_rmac_group=inner_rmac,
@@ -942,7 +987,7 @@ def program_tunnel_ethernet_vlan(client, sess_hdl, dev_tgt, vrf, vlan, port, vni
                             action_igmp_snooping_enabled=0,
                             action_ipv4_urpf_mode=0,
                             action_stats_idx=0)
-    hdl = client.tunnel_table_add_with_terminate_tunnel_inner_ethernet_ipv4(
+    hdl = client.ingress_tunnel_tunnel_table_add_with_ingress_tunnel_terminate_tunnel_inner_ethernet_ipv4(
                             sess_hdl, dev_tgt,
                             match_spec, action_spec)
     return hdl
@@ -955,19 +1000,19 @@ def delete_tunnel_ethernet_vlan(client, sess_hdl, dev, hdl):
 
 def program_tunnel_ipv4_vlan(client, sess_hdl, dev_tgt, vlan, port, vni, ttype,
                             v4_enabled, inner_rmac, vrf):
-    match_spec = dc_tunnel_match_spec_t(
-                             tunnel_metadata_tunnel_vni=vni,
-                             tunnel_metadata_ingress_tunnel_type=ttype,
+    match_spec = dc_ingress_tunnel_tunnel_match_spec_t(
+                             userMetadata_tunnel_metadata_tunnel_vni=vni,
+                             userMetadata_tunnel_metadata_ingress_tunnel_type=ttype,
                              inner_ipv4_valid=1,
                              inner_ipv6_valid=0)
-    action_spec = dc_terminate_tunnel_inner_ipv4_action_spec_t(
+    action_spec = dc_ingress_tunnel_terminate_tunnel_inner_ipv4_action_spec_t(
                             action_vrf=vrf,
                             action_rmac_group=inner_rmac,
-                            action_mrpf_group=0,
+                            action_ipv4_urpf_mode=0,
                             action_ipv4_unicast_enabled=v4_enabled,
                             action_ipv4_multicast_enabled=0,
-                            action_ipv4_urpf_mode=0)
-    hdl = client.tunnel_table_add_with_terminate_tunnel_inner_ipv4(
+                            action_mrpf_group=0)
+    hdl = client.ingress_tunnel_tunnel_table_add_with_ingress_tunnel_terminate_tunnel_inner_ipv4(
                             sess_hdl, dev_tgt,
                             match_spec, action_spec)
     return hdl
@@ -978,41 +1023,41 @@ def delete_tunnel_ipv4_vlan(client, sess_hdl, dev, hdl):
                             hdl)
 
 def program_mac(client, sess_hdl, dev_tgt, vlan, mac, port):
-    match_spec = dc_dmac_match_spec_t(
-                            l2_metadata_lkp_mac_da=macAddr_to_string(mac),
-                            ingress_metadata_bd=vlan)
-    action_spec = dc_dmac_hit_action_spec_t(
+    match_spec = dc_ingress_mac_dmac_match_spec_t(
+                            userMetadata_l2_metadata_lkp_mac_da=macAddr_to_string(mac),
+                            userMetadata_ingress_metadata_bd=vlan)
+    action_spec = dc_ingress_mac_dmac_hit_action_spec_t(
                             action_ifindex=port)
-    dmac_hdl = client.dmac_table_add_with_dmac_hit(
+    dmac_hdl = client.ingress_mac_dmac_table_add_with_ingress_mac_dmac_hit(
                             sess_hdl, dev_tgt,
                             match_spec, action_spec, 0)
 
-    match_spec = dc_smac_match_spec_t(
-                            l2_metadata_lkp_mac_sa=macAddr_to_string(mac),
-                            ingress_metadata_bd=vlan)
-    action_spec = dc_smac_hit_action_spec_t(
+    match_spec = dc_ingress_mac_smac_match_spec_t(
+                            userMetadata_l2_metadata_lkp_mac_sa=macAddr_to_string(mac),
+                            userMetadata_ingress_metadata_bd=vlan)
+    action_spec = dc_ingress_mac_smac_hit_action_spec_t(
                             action_ifindex=port)
-    smac_hdl = client.smac_table_add_with_smac_hit(
+    smac_hdl = client.ingress_mac_smac_table_add_with_ingress_mac_smac_hit(
                             sess_hdl, dev_tgt,
                             match_spec, action_spec)
     return dmac_hdl, smac_hdl
 
 def program_mac_with_nexthop(client, sess_hdl, dev_tgt, vlan, mac, port, nhop):
-    match_spec = dc_dmac_match_spec_t(
-                            l2_metadata_lkp_mac_da=macAddr_to_string(mac),
-                            ingress_metadata_bd=vlan)
-    action_spec = dc_dmac_redirect_nexthop_action_spec_t(
+    match_spec = dc_ingress_mac_dmac_match_spec_t(
+                            userMetadata_l2_metadata_lkp_mac_da=macAddr_to_string(mac),
+                            userMetadata_ingress_metadata_bd=vlan)
+    action_spec = dc_ingress_mac_dmac_redirect_nexthop_action_spec_t(
                             action_nexthop_index=nhop)
-    dmac_hdl = client.dmac_table_add_with_dmac_redirect_nexthop(
+    dmac_hdl = client.ingress_mac_dmac_table_add_with_ingress_mac_dmac_redirect_nexthop(
                             sess_hdl, dev_tgt,
                             match_spec, action_spec, 0)
 
-    match_spec = dc_smac_match_spec_t(
-                            l2_metadata_lkp_mac_sa=macAddr_to_string(mac),
-                            ingress_metadata_bd=vlan)
-    action_spec = dc_smac_hit_action_spec_t(
+    match_spec = dc_ingress_mac_smac_match_spec_t(
+                            userMetadata_l2_metadata_lkp_mac_sa=macAddr_to_string(mac),
+                            userMetadata_ingress_metadata_bd=vlan)
+    action_spec = dc_ingress_mac_smac_hit_action_spec_t(
                             action_ifindex=port)
-    smac_hdl = client.smac_table_add_with_smac_hit(
+    smac_hdl = client.ingress_mac_smac_table_add_with_ingress_mac_smac_hit(
                             sess_hdl, dev_tgt,
                             match_spec, action_spec)
     return dmac_hdl, smac_hdl
@@ -1020,9 +1065,9 @@ def program_mac_with_nexthop(client, sess_hdl, dev_tgt, vlan, mac, port, nhop):
 def program_multicast_mac(client, sess_hdl, dev_tgt, vlan, mac, port,
                           start_mcidx):
     mcidx = start_mcidx + port
-    match_spec = dc_dmac_match_spec_t(
-                            l2_metadata_lkp_mac_da=macAddr_to_string(mac),
-                            ingress_metadata_bd=vlan)
+    match_spec = dc_ingress_mac_dmac_match_spec_t(
+                            userMetadata_l2_metadata_lkp_mac_da=macAddr_to_string(mac),
+                            userMetadata_ingress_metadata_bd=vlan)
     action_spec = dc_dmac_multicast_hit_action_spec_t(
                             action_mc_index=mcidx)
     dmac_hdl = client.dmac_table_add_with_dmac_multicast_hit(
@@ -1036,22 +1081,22 @@ def delete_dmac(client, sess_hdl, dev, dmac_hdl):
                             dmac_hdl)
 
 def delete_mac(client, sess_hdl, dev, dmac_hdl, smac_hdl):
-    client.dmac_table_delete(
+    client.ingress_mac_dmac_table_delete(
                             sess_hdl, dev,
                             dmac_hdl)
 
-    client.smac_table_delete(
+    client.ingress_mac_smac_table_delete(
                             sess_hdl, dev,
                             smac_hdl)
 
 def program_ipv4_route(client, sess_hdl, dev_tgt, vrf, ip, prefix, nhop):
     if prefix == 32:
-        match_spec = dc_ipv4_fib_match_spec_t(
-                             l3_metadata_vrf=vrf,
-                             ipv4_metadata_lkp_ipv4_da=ip)
-        action_spec = dc_fib_hit_nexthop_action_spec_t(
+        match_spec = dc_ingress_ipv4_fib_ipv4_fib_match_spec_t(
+                             userMetadata_l3_metadata_vrf=vrf,
+                             userMetadata_ipv4_metadata_lkp_ipv4_da=ip)
+        action_spec = dc_ingress_ipv4_fib_fib_hit_nexthop_action_spec_t(
                              action_nexthop_index=nhop)
-        hdl = client.ipv4_fib_table_add_with_fib_hit_nexthop(
+        hdl = client.ingress_ipv4_fib_ipv4_fib_table_add_with_ingress_ipv4_fib_fib_hit_nexthop(
                              sess_hdl, dev_tgt,
                              match_spec, action_spec)
     else:
@@ -1114,13 +1159,13 @@ def delete_ipv6_route(client, sess_hdl, dev, prefix, hdl, ipv6_enabled):
                              hdl)
 
 def program_nexthop(client, sess_hdl, dev_tgt, nhop, vlan, ifindex, tunnel):
-    match_spec = dc_nexthop_match_spec_t(
-                             l3_metadata_nexthop_index=nhop)
-    action_spec = dc_set_nexthop_details_action_spec_t(
+    match_spec = dc_ingress_nexthop_nexthop_match_spec_t(
+                             userMetadata_l3_metadata_nexthop_index=nhop)
+    action_spec = dc_ingress_nexthop_set_ecmp_nexthop_details_action_spec_t(
                              action_ifindex=ifindex,
                              action_bd=vlan,
                              action_tunnel=tunnel)
-    hdl = client.nexthop_table_add_with_set_nexthop_details(
+    hdl = client.ingress_nexthop_nexthop_table_add_with_ingress_nexthop_set_nexthop_details(
                              sess_hdl, dev_tgt,
                              match_spec, action_spec)
     return hdl
@@ -1208,15 +1253,15 @@ def delete_tunnel_l3_unicast_rewrite(client, sess_hdl, dev, hdl):
                                   hdl)
 
 def enable_learning(client, sess_hdl, dev_tgt):
-    match_spec = dc_learn_notify_match_spec_t(
-                             l2_metadata_l2_src_miss=1,
-                             l2_metadata_l2_src_miss_mask=1,
-                             l2_metadata_l2_src_move=0,
-                             l2_metadata_l2_src_move_mask=0,
-                             l2_metadata_stp_state=0,
-                             l2_metadata_stp_state_mask=0)
+    match_spec = dc_ingress_mac_learning_learn_notify_match_spec_t(
+                             userMetadata_l2_metadata_l2_src_miss=1,
+                             userMetadata_l2_metadata_l2_src_miss_mask=1,
+                             userMetadata_l2_metadata_l2_src_move=0,
+                             userMetadata_l2_metadata_l2_src_move_mask=0,
+                             userMetadata_l2_metadata_stp_state=0,
+                             userMetadata_l2_metadata_stp_state_mask=0)
 
-    client.learn_notify_table_add_with_generate_learn_notify(
+    client.ingress_mac_learning_learn_notify_table_add_with_ingress_mac_learning_generate_learn_notify(
                              sess_hdl, dev_tgt,
                              match_spec, 1000)
 
@@ -1404,71 +1449,71 @@ def program_egress_vni(client, sess_hdl, dev_tgt, egress_tunnel_type,
                                   tunnel_metadata_egress_tunnel_type=egress_tunnel_type)
     action_spec = dc_set_egress_tunnel_vni_action_spec_t(
                                   action_vnid=vnid)
-    hdl = client.egress_vni_table_add_with_set_egress_tunnel_vni(
+    hdl = client.egress_tunnel_encap_egress_vni_table_add_with_egress_tunnel_encap_set_egress_tunnel_vni(
                                   sess_hdl, dev_tgt,
                                   match_spec, action_spec)
     return hdl
 
 def delete_egress_vni(client, sess_hdl, dev, hdl):
-    client.egress_vni_table_delete(
+    client.egress_tunnel_encap_egress_vni_table_delete(
                                   sess_hdl, dev,
                                   hdl)
 
 def program_egress_vlan_xlate(client, sess_hdl, dev_tgt, ifindex, bd,
                               ctag=None, stag=None):
-    match_spec = dc_egress_vlan_xlate_match_spec_t(
-                                egress_metadata_ifindex=ifindex,
-                                egress_metadata_bd=bd)
+    match_spec = dc_egress_vlan_xlate_egress_vlan_xlate_match_spec_t(
+                                userMetadata_egress_metadata_ifindex=ifindex,
+                                userMetadata_egress_metadata_bd=bd)
     if ((ctag is not None) and (stag is None)):
         action_spec = dc_set_egress_packet_vlan_tagged_action_spec_t(
                                 action_vlan_id=ctag)
         hdl = \
-            client.egress_vlan_xlate_table_add_with_set_egress_packet_vlan_tagged(
+            client.egress_vlan_xlate_egress_vlan_xlate_table_add_with_egress_vlan_xlate_set_egress_packet_vlan_tagged(
                                 sess_hdl, dev_tgt, match_spec, action_spec)
     elif ((ctag is not None) and (stag is not None)):
-        action_spec = dc_set_egress_packet_vlan_double_tagged_action_spec_t(
+        action_spec = dc_egress_vlan_xlate_set_egress_packet_vlan_double_tagged_action_spec_t(
                                 action_s_tag=stag, action_c_tag=ctag)
         hdl = \
-            client.egress_vlan_xlate_table_add_with_set_egress_packet_vlan_double_tagged(
+            client.egress_vlan_xlate_egress_vlan_xlate_table_add_with_egress_vlan_xlate_set_egress_packet_vlan_double_tagged(
                                 sess_hdl, dev_tgt, match_spec, action_spec)
     return hdl
 
 def delete_egress_vlan_xlate(client, sess_hdl, dev, hdl):
-    client.egress_vlan_xlate_table_delete(sess_hdl, dev, hdl)
+    client.egress_vlan_xlate_egress_vlan_xlate_table_delete(sess_hdl, dev, hdl)
 
 def program_egress_bd_properties(client, sess_hdl, dev_tgt, bd, rewrite_index):
-    match_spec = dc_egress_bd_map_match_spec_t(
-                                egress_metadata_bd=bd)
-    action_spec = dc_set_egress_bd_properties_action_spec_t(
+    match_spec = dc_egress_egress_bd_egress_bd_map_match_spec_t(
+                                userMetadata_egress_metadata_bd=bd)
+    action_spec = dc_egress_egress_bd_set_egress_bd_properties_action_spec_t(
                                 action_smac_idx=rewrite_index,
                                 action_nat_mode=0,
                                 action_bd_label=0)
-    hdl = client.egress_bd_map_table_add_with_set_egress_bd_properties(
+    hdl = client.egress_egress_bd_egress_bd_map_table_add_with_egress_egress_bd_set_egress_bd_properties(
                                 sess_hdl, dev_tgt, match_spec, action_spec)
     return hdl
 
 def delete_egress_bd_properties(client, sess_hdl, dev, hdl):
-    client.egress_bd_map_table_delete(sess_hdl, dev, hdl)
+    client.egress_egress_bd_egress_bd_map_table_delete(sess_hdl, dev, hdl)
 
 def program_rid(client, sess_hdl, dev_tgt, rid, inner_replica, bd,
                 tunnel_index, tunnel_type, header_count):
-    match_spec = dc_rid_match_spec_t(intrinsic_metadata_egress_rid=rid)
+    match_spec = dc_egress_replication_rid_match_spec_t(userMetadata_intrinsic_metadata_egress_rid=rid)
     if inner_replica:
-        action_spec = dc_inner_replica_from_rid_action_spec_t(
+        action_spec = dc_egress_replication_inner_replica_from_rid_action_spec_t(
             action_bd=bd, action_tunnel_index=tunnel_index,
             action_tunnel_type=tunnel_type, action_header_count=header_count)
-        hdl = client.rid_table_add_with_inner_replica_from_rid(
+        hdl = client.egress_replication_rid_table_add_with_egress_replication_inner_replica_from_rid(
             sess_hdl, dev_tgt, match_spec, action_spec)
     else:
         action_spec = dc_outer_replica_from_rid_action_spec_t(
             action_bd=bd, action_tunnel_index=tunnel_index,
             action_tunnel_type=tunnel_type, action_header_count=header_count)
-        hdl = client.rid_table_add_with_outer_replica_from_rid(
+        hdl = client.egress_replication_rid_table_add_with_egress_replication_outer_replica_from_rid(
             sess_hdl, dev_tgt, match_spec, action_spec)
     return hdl
 
 def delete_rid(client, sess_hdl, dev, hdl):
-    client.rid_table_delete(sess_hdl, dev, hdl)
+    client.egress_replication_rid_table_delete(sess_hdl, dev, hdl)
 
 def client_init(client, sess_hdl, dev_tgt):
     print "Cleaning state"
